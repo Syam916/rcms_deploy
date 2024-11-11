@@ -1,0 +1,312 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+ 
+html, body {
+    height: 100%;
+}
+ 
+body {
+    background: linear-gradient(135deg, #7F7FD5, #86A8E7, #91EAE4);
+    background-size: cover;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+ 
+.container {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    flex-grow: 1;
+    width: 100%;
+    max-width: 1600px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+    height: 100vh;
+    overflow-y: hidden;
+}
+ 
+/* Top section styling for User ID, Factory ID, and Heading */
+.top-section {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    width: 100%;
+}
+ 
+.top-section-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+}
+ 
+.user-info {
+    font-size: 18px;
+    color: #333;
+}
+ 
+h1 {
+    font-size: 26px;
+    color: #333;
+    letter-spacing: 1px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+ 
+/* Filter Options Styling */
+.filter-options {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+ 
+.filter-options label {
+    margin-right: 15px;
+    font-size: 16px;
+    color: #333;
+    display: flex;
+    align-items: center;
+}
+ 
+.filter-options input[type="radio"] {
+    margin-right: 8px;
+    transform: scale(1.2);
+}
+ 
+/* Add subtle hover effect to filter labels */
+.filter-options label:hover {
+    color: #007BFF;
+}
+ 
+/* Compliance Grid */
+.compliance-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+ 
+.status-table-wrapper {
+    overflow-y: auto;
+    height: calc(100vh - 250px); /* Adjust for static top part */
+}
+ 
+.status-table {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #fff;
+    padding: 10px;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+    padding-bottom: 20px;
+    position: relative;
+}
+ 
+.status-table h2 {
+    text-align: center;
+    padding: 12px;
+    font-size: 18px;
+    margin-bottom: 12px;
+    margin-top: 0;
+    color: white;
+    border-radius: 10px;
+}
+ 
+/* Sticky Table Header */
+table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    color: black;
+}
+ 
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    margin-top: 10px;
+}
+ 
+th, td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+}
+ 
+/* Colors for Section Headings */
+.delayed h2 {
+    background-color: #FF6347; /* Tomato */
+}
+ 
+.in-progress h2 {
+    background-color: #FFD700; /* Gold */
+}
+ 
+.due-this-month h2 {
+    background-color: #4682B4 ; /* Lime Green */
+}
+ 
+.completed h2 {
+    background-color:  #32CD32; /* Steel Blue */
+}
+ 
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .compliance-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns on medium screens */
+    }
+}
+ 
+@media (max-width: 480px) {
+    .compliance-grid {
+        grid-template-columns: 1fr; /* 1 column on small screens */
+    }
+}
+ 
+.sticky-top {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 3;
+    padding: 10px;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+}
+ 
+.delayed-row {
+    background-color: #DC143C; /* Highlight overdue tasks */
+}
+.disabled-link {
+    color: rgb(200, 195, 195);
+    text-decoration: none;
+    position: relative;
+    cursor: not-allowed;
+}
+.disabled-link:hover::after {
+    content: 'This task is not ready for review.';
+    position: absolute;
+    background-color: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    top: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    z-index: 1000;
+}
+.disabled-link:hover::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent #333 transparent;
+}
+.preparation-role {
+    color: rgb(147, 234, 107);
+}
+.review-role {
+    color: rgb(140, 216, 244);
+}
+ 
+.completed-reviewed {
+    color: gray;
+    text-decoration: none;
+    cursor: not-allowed;
+}
+ 
+.completed-reviewed:hover::after {
+    content: 'This task is not ready for review.';
+    position: absolute;
+    background-color: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    top: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    z-index: 1000;
+}
+ 
+.completed-reviewed:hover::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent #333 transparent;
+}
+ 
+ 
+/* Criticality Levels
+.low-criticality {
+    background-color: #d4edda; /* Light Green for low criticality */
+/* }
+ 
+.medium-criticality {
+    background-color: #fff3cd; } /* Light Yellow for medium criticality */
+ 
+ 
+.high-criticality {
+    background-color: #dd59e9; /* Light Red for high criticality */
+}
+ 
+/* For delayed tasks, we want a stronger color to indicate urgency */
+.delayed-row {
+    background-color: #db2b2b; /* Light red to indicate overdue tasks */
+}
+ 
+/* Tasks that are both high-criticality and delayed */
+/* Critical and Delayed - Custom Color */
+.critical-delayed {
+    background-color: #e448a3; /* Orange Red - You can adjust this color */
+}
+ 
+ 
+/* Sticky Table Header */
+table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    color: black;
+}
+ 
+    .logout-button {
+        background-color: #FF6347; /* A bold color for the logout button, such as tomato red */
+        color: white; /* White text */
+        padding: 10px 20px; /* Add some padding for spacing */
+        border: none; /* Remove border */
+        border-radius: 5px; /* Rounded corners */
+        cursor: pointer; /* Change the cursor to a pointer on hover */
+        font-size: 14px; /* Adjust the font size */
+        transition: background-color 0.3s ease; /* Smooth transition effect */
+        font-weight: bold; /* Make text bold */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
+    }
+    .logout-button:hover {
+        background-color: #FF4500; /* Darker red on hover */
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /* Slightly larger shadow on hover */
+    }
+    .logout-button:active {
+        background-color: #FF0000; /* Even darker red when clicked */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Smaller shadow when clicked */
+    }

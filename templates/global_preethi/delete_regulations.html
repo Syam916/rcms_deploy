@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Regulations</title>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center; /* Vertically centers the container */
+            min-height: 100vh;
+            background: linear-gradient(135deg, #71b7e6, #9b59b6);
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: left;
+        }
+        /* Display the entity_id and user_id */
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .form-header .entity-id,
+        .form-header .user-id {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .form-header strong {
+            font-weight: bold; /* Making the labels bold */
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+            color: #4a4a4a;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        select {
+            width: 100%;
+            height: 40px;
+            padding: 5px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .buttons input[type="button"] {
+            padding: 12px 20px;
+            border: none;
+            color: #fff;
+            background-color: #5cb85c;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 45%;
+        }
+
+        .buttons input[type="button"]:hover {
+            background-color: #4cae4c;
+        }
+
+        .back-button {
+            background-color: #f0ad4e;
+        }
+
+        .back-button:hover {
+            background-color: #ec971f;
+        }
+
+        /* Custom Select2 Styling */
+        .select2-container--default .select2-selection--single {
+            height: 40px;
+            border-radius: 5px;
+            border-color: #ccc;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            padding-left: 12px;
+        }
+
+        .select2-container {
+            width: 100% !important;
+        }
+
+        /* No regulations message */
+        .no-regulations {
+            text-align: center;
+            color: red;
+            font-size: 16px;
+            display: none;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Displaying Entity ID and User ID at the top of the form -->
+        <div class="form-header">
+            <div class="entity-id"><strong>Entity ID:</strong> {{ entity_id }}</div>
+            <div class="user-id"><strong>User ID:</strong> {{ user_id }}</div>
+        </div>
+        
+        <h1>Delete Regulations</h1>
+
+        <!-- Searchable Select2 Category Input -->
+        <label for="categorySelect">Select Category:</label>
+        <select id="categorySelect" style="width: 100%"></select>
+
+        <!-- No regulations message -->
+        <p class="no-regulations" id="noRegulationsMessage">No regulations available for the selected category.</p>
+
+        <table id="regulationTable" style="display:none;">
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Regulation Name</th>
+                    <th>Regulatory Body</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Regulations will be dynamically loaded here -->
+            </tbody>
+        </table>
+
+        <div class="buttons">
+            <input type="button" value="Delete Selected" onclick="confirmDelete()">
+            <input type="button" value="Back" class="back-button" onclick="window.location.href='/global_admin_dashboard';">
+        </div>
+    </div>
+
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        let categoryData = [];
+
+        function fetchCategories() {
+            fetch('/fetch_main_categories')
+                .then(response => response.json())
+                .then(data => {
+                    categoryData = data;  // Store all categories
+                    updateCategoryDropdown(data);
+                });
+        }
+
+        function updateCategoryDropdown(categories) {
+            const categorySelect = $('#categorySelect');
+            categorySelect.empty(); // Clear any existing options
+
+            categorySelect.append('<option value="">Select Category</option>'); // Default option
+            categories.forEach(category => {
+                categorySelect.append(`<option value="${category.category_id}">${category.category_type}</option>`);
+            });
+
+            // Initialize Select2
+            categorySelect.select2({
+                placeholder: 'Search or Select Category',
+                allowClear: true
+            });
+        }
+
+        $('#categorySelect').on('change', function() {
+            const categoryId = $(this).val();
+            fetchRegulations(categoryId);
+        });
+
+        function fetchRegulations(categoryId) {
+            const noRegulationsMessage = document.getElementById('noRegulationsMessage');
+            const regulationTable = document.getElementById('regulationTable');
+            const tbody = regulationTable.getElementsByTagName('tbody')[0];
+            
+            // Hide table and message initially
+            tbody.innerHTML = '';
+            regulationTable.style.display = 'none';
+            noRegulationsMessage.style.display = 'none';
+
+            if (categoryId) {
+                fetch(`/load_main_regulations/${categoryId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.length > 0) {
+                            // Show table and add rows
+                            regulationTable.style.display = 'table';
+                            data.forEach(regulation => {
+                                const row = tbody.insertRow();
+                                const checkboxCell = row.insertCell(0);
+                                const nameCell = row.insertCell(1);
+                                const bodyCell = row.insertCell(2);
+
+                                checkboxCell.innerHTML = `<input type="checkbox" name="regulation_ids" value="${regulation.regulation_id}">`;
+                                nameCell.innerHTML = regulation.regulation_name;
+                                bodyCell.innerHTML = regulation.regulatory_body;
+                            });
+                        } else {
+                            // Show the no regulations message
+                            noRegulationsMessage.style.display = 'block';
+                        }
+                    });
+            }
+        }
+
+        function confirmDelete() {
+            const checkboxes = document.querySelectorAll('input[name="regulation_ids"]:checked');
+            if (checkboxes.length === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Please select at least one regulation to delete!'
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to delete the selected regulations?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const formData = new FormData();
+                    checkboxes.forEach(checkbox => {
+                        formData.append('regulation_ids', checkbox.value);
+                    });
+
+                    fetch('/delete_main_regulations', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.message) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted!',
+                                text: data.message
+                            }).then(() => {
+                                // After deletion, refresh the regulations list
+                                const categoryId = $('#categorySelect').val(); // Get selected category ID
+                                fetchRegulations(categoryId); // Refresh the table
+                            });
+                        } else if (data.error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: data.error
+                            });
+                        }
+                    });
+                }
+            });
+        }
+        // Fetch categories when the page loads
+        window.onload = fetchCategories;
+    </script>
+</body>
+</html>

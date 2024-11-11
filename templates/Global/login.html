@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/Global/login.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pop-up.css') }}">
+
+    
+    <!-- Include Font Awesome for the eye icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <style>
+        .eye-icon {
+            position: absolute;
+            right: 15px;
+            top: 35px;
+            cursor: pointer;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group input[type="password"] {
+            padding-right: 40px; /* Ensure space for the eye icon */
+        }
+
+        .login-btn {
+            margin-top: 10px;
+        }
+
+        .login_adjust{
+            display: flex;
+            justify-content: space-between;
+            margin-top: -25px;
+        }
+
+        .img-login{
+
+            width: 100px;
+            height: 100px;
+        
+
+        }
+
+        .login_adjust h2{
+            margin-top: 40px;
+            font-size: 30px;;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Panel - Login Form -->
+        <div class="login-panel">
+            <div class="login_adjust">
+                <h2>Login</h2>
+
+                <img class="img-login" src="static/images/Vardaan RCMS.png" alt="Project Progress Illustration">
+            
+
+            </div>
+            
+            
+            <form action="{{ url_for('login') }}" method="post">
+                <div class="form-group">
+                    <label for="user_id">User ID</label>
+                    <input type="text" id="user_id" name="user_id" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                    <!-- Font Awesome Eye icon for toggling password visibility -->
+                    <i class="far fa-eye eye-icon" id="toggle-password" onclick="togglePasswordVisibility('password', this)"></i>
+                </div>
+
+                <div class="form-options">
+                    <!-- <label>
+                        <input type="checkbox" name="remember"> Remember me
+                    </label> -->
+                    <a href="#" class="forgot-password" onclick="triggerForgotPassword()">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="login-btn">Login</button>
+
+            
+            </form>
+        </div>
+
+        <!-- Right Panel - Illustration/Description -->
+        <div class="illustration-panel">
+            <h3>Risk and Compliance Management System</h3>
+            <img src="static/images/login2.webp" alt="Project Progress Illustration">
+            
+        </div>
+    </div>
+
+    <!-- Hidden form for forgot password -->
+    <form id="forgotPasswordForm" action="{{ url_for('forgot_password') }}" method="POST" style="display:none;">
+        <input type="hidden" name="user_id" id="forgot_user_id">
+    </form>
+
+    <!-- Hidden divs to store success and error messages -->
+    <!-- Hidden divs to store error_type and remarks -->
+    <div id="error-type" style="display:none;">
+        {% if error_type %}
+            {{ error_type }}
+        {% endif %}
+    </div>
+
+    <div id="remarks" style="display:none;">
+        {% if remarks %}
+            {{ remarks }}
+        {% endif %}
+    </div>
+
+
+    <!-- Popup overlay and content -->
+    <div class="overlay" id="overlay" style="display: none;"></div>
+    <div class="popup" id="popup" style="display: none;">
+        <div id="popup-icon"></div>
+        <h2 id="popup-title"></h2>
+        <p id="popup-message"></p>
+        <button onclick="closePopup()" id="popup-button">Continue</button>
+    </div>
+
+    <!-- Load the popup.js script -->
+    <script src="{{ url_for('static', filename='js/popup.js') }}"></script>
+
+    <script>
+        checkMessages()
+        function triggerForgotPassword() {
+            var userId = document.getElementById('user_id').value;  // Get the value from the visible user_id input
+
+            if (userId) {
+                // Set the user_id in the hidden form for forgot password
+                document.getElementById('forgot_user_id').value = userId;  // Set it to the hidden input
+                document.getElementById('forgotPasswordForm').submit();    // Submit the hidden form
+            } else {
+                alert("Please enter your User ID before proceeding with Forgot Password.");
+            }
+        }
+
+        // Function to toggle password visibility with Font Awesome icons
+        function togglePasswordVisibility(inputId, eyeIcon) {
+            const inputField = document.getElementById(inputId);
+
+            if (inputField.type === "password") {
+                inputField.type = "text";
+                eyeIcon.classList.remove("fa-eye");
+                eyeIcon.classList.add("fa-eye-slash");  // Switch to eye-slash icon
+            } else {
+                inputField.type = "password";
+                eyeIcon.classList.remove("fa-eye-slash");
+                eyeIcon.classList.add("fa-eye");  // Switch back to eye icon
+            }
+        }
+    </script>
+</body>
+</html>

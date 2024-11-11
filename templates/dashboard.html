@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        /* Custom styles for responsibility type */
+        .dashboard-container {
+            background-color: #ffffff;
+            padding: 5px;  /* Reduced padding */
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 97%;  /* Reduced width */
+            max-width: 1400px;  /* Reduced max-width */
+            text-align: center;
+            overflow-y: auto;
+            height: 100vh;  /* Reduced max-height */
+            border: 1px solid #ddd;
+            margin-top: 10px;
+        }
+        .dashboard-title {
+            margin: 0;
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .tables-container {
+            display: flex;  /* Use flexbox to align tables in a row */
+            justify-content: space-between;  /* Ensure tables are spaced evenly */
+            padding: 10px;
+            background-color: #fff;
+            margin: 10px auto;  /* Center the container */
+            max-width: 120%;  /* Allow container to take full width of the page */
+        }
+        .table-category {
+            flex: 1 1 24%;  /* Adjust each table to take up approximately 1/4 of the row */
+            margin: 10px;  /* Add some space around each table */
+            min-width: 200px;  /* Set a minimum width to prevent tables from becoming too small */
+            max-width: 25%;  /* Prevent tables from exceeding their allocated space */
+        }
+        .preparation-responsibility {
+            font-weight: bold;
+            color: green;
+        }
+        .review-responsibility {
+            font-weight: bold;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1 class="dashboard-title">Regulatory Compliance Status</h1>
+ 
+        <!-- Displaying User and Factory ID -->
+        <div class="user-id-container">
+            User ID: {{ user_id }}
+        </div>
+        <div class="factory-id-container">
+            Factory ID: {{ factory_id }}
+        </div>
+ 
+        <!-- Tables Container -->
+        <div class="tables-container">
+            <!-- Delayed Table -->
+            <div class="table-category">
+                <h3 class="delayed-highlight">Delayed</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Regulation ID</th>
+                            <th>Regulation Name</th>
+                            <th>Due On</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for regulation in delayed %}
+                        <tr>
+                            <td>{{ regulation.regulation_id }}</td>
+                            <td>
+                                <a href="{{ url_for('view_regulation', regulation_id=regulation.regulation_id, due_on=regulation.due_on) }}">
+                                    {{ regulation.regulation_name }}
+                                </a>
+                                <!-- Add responsibility type highlight here -->
+                                {% if regulation.responsibility_type == 'Preparation' %}
+                                    <span class="preparation-responsibility">(Preparation)</span>
+                                {% elif regulation.responsibility_type == 'Review' %}
+                                    <span class="review-responsibility">(Review)</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ regulation.due_on }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% if delayed|length == 0 %}
+                        <tr>
+                            <td colspan="3">No delayed regulations.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+ 
+            <!-- In Progress Table -->
+            <div class="table-category">
+                <h3 class="in-progress-highlight">In Progress</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Regulation ID</th>
+                            <th>Regulation Name</th>
+                            <th>Due On</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for regulation in in_progress %}
+                        <tr>
+                            <td>{{ regulation.regulation_id }}</td>
+                            <td>
+                                <a href="{{ url_for('view_regulation', regulation_id=regulation.regulation_id, due_on=regulation.due_on) }}">
+                                    {{ regulation.regulation_name }}
+                                </a>
+                                <!-- Add responsibility type highlight here -->
+                                {% if regulation.responsibility_type == 'Preparation' %}
+                                    <span class="preparation-responsibility">(Preparation)</span>
+                                {% elif regulation.responsibility_type == 'Review' %}
+                                    <span class="review-responsibility">(Review)</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ regulation.due_on }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% if in_progress|length == 0 %}
+                        <tr>
+                            <td colspan="3">No regulations in progress.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+ 
+            <!-- Due This Month Table -->
+            <div class="table-category">
+                <h3 class="due-this-month-highlight">Due This Month</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Regulation ID</th>
+                            <th>Regulation Name</th>
+                            <th>Due On</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for regulation in due_this_month %}
+                        <tr>
+                            <td>{{ regulation.regulation_id }}</td>
+                            <td>
+                                <a href="{{ url_for('view_regulation', regulation_id=regulation.regulation_id, due_on=regulation.due_on) }}">
+                                    {{ regulation.regulation_name }}
+                                </a>
+                                <!-- Add responsibility type highlight here -->
+                                {% if regulation.responsibility_type == 'Preparation' %}
+                                    <span class="preparation-responsibility">(Preparation)</span>
+                                {% elif regulation.responsibility_type == 'Review' %}
+                                    <span class="review-responsibility">(Review)</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ regulation.due_on }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% if due_this_month|length == 0 %}
+                        <tr>
+                            <td colspan="3">No regulations due this month.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+ 
+            <!-- Completed Table -->
+            <div class="table-category">
+                <h3 class="completed-highlight">Completed</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Regulation ID</th>
+                            <th>Regulation Name</th>
+                            <th>Due On</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for regulation in completed %}
+                        <tr>
+                            <td>{{ regulation.regulation_id }}</td>
+                            <td>
+                                <a href="{{ url_for('view_regulation', regulation_id=regulation.regulation_id, due_on=regulation.due_on) }}">
+                                    {{ regulation.regulation_name }}
+                                </a>
+                                <!-- Add responsibility type highlight here -->
+                                {% if regulation.responsibility_type == 'Preparation' %}
+                                    <span class="preparation-responsibility">(Preparation)</span>
+                                {% elif regulation.responsibility_type == 'Review' %}
+                                    <span class="review-responsibility">(Review)</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ regulation.due_on }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% if completed|length == 0 %}
+                        <tr>
+                            <td colspan="3">No completed regulations.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Entity</title>
+    <!-- Link to the global CSS file -->
+    <link rel="stylesheet" href="static/css/global.css">
+</head>
+<body>
+    <!-- Include the hidden divs for storing messages -->
+    <div id="success-message" style="display:none;">
+        {% if success_message %}
+            {{ success_message }}
+        {% endif %}
+    </div>
+
+    <div id="error-message" style="display:none;">
+        {% if error_message %}
+            {{ error_message }}
+        {% endif %}
+    </div>
+
+    <!-- Popup overlay and content -->
+    <div class="overlay" id="overlay" style="display: none;"></div>
+    <div class="popup" id="popup" style="display: none;">
+        <div id="popup-icon"></div>
+        <h2 id="popup-title"></h2>
+        <p id="popup-message"></p>
+        <button onclick="closePopup()" id="popup-button">Continue</button>
+    </div>
+
+    <!-- Load the popup.js script -->
+    <script src="{{ url_for('static', filename='js/popup.js') }}"></script>
+
+</body>
+</html>

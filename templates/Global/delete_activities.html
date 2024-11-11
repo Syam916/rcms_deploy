@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Activities</title>
+
+    <!-- Include Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    <!-- Include SweetAlert2 for alerts -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bubble.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pop-up.css') }}">
+
+    <style>
+
+        body {
+            background: linear-gradient(to right, #1E90FF, #87CEEB); /* Blue gradient */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative; /* Necessary for the bubbles to be placed relative to the body */
+        }
+
+        .image-container {
+    max-width: 500px;
+    width: 130%;
+    margin-right: 15%;
+}
+
+.image-container img {
+    max-width: 130%;
+    border-radius: 15px;
+}
+
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 900px;
+            width: 100%;
+            margin-left: 10%;
+        }
+        /* Display the entity_id and user_id */
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .form-header .entity-id,
+        .form-header .user-id {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .form-header strong {
+            font-weight: bold; /* Making the labels bold */
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        input[type="button"] {
+            padding: 8px 12px;
+            border: none;
+            color: #fff;
+            background-color: #1E90FF;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+        input[type="button"]:hover {
+            background-color: #1E90FF;
+        }
+        /* Flexbox layout for form group */
+        .form-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-right: 10px;
+            min-width: 150px;
+        }
+
+        select {
+            width: 250px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        /* Style for Select2 */
+        .select2-container .select2-selection--single {
+            height: 38px;
+        }
+
+        #custom-confirm-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        #custom-confirm-popup {
+            background-color: #fff;
+            padding: 20px;
+            width: 300px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .confirm-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .confirm-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #confirm-yes {
+            background-color: #4CAF50;
+            color: #fff;
+        }
+
+        #confirm-no {
+            background-color: #f44336;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="container"><!-- Displaying Entity ID and User ID at the top of the form -->
+        <div class="form-header">
+           <div class="entity-id"><strong>Entity ID:</strong> {{ entity_id }}</div>
+           <div class="user-id"><strong>User ID:</strong> {{ user_id }}</div>
+       </div>
+        <h1>Delete Activities</h1>
+    
+        <label for="regulationSelect">Select Regulation:</label>
+        <select id="regulationSelect" class="searchable-dropdown" onchange="fetchActivities()">
+            <option value="">Select Regulation</option>
+        </select>
+    
+        <!-- Message to show when no activities are available -->
+        <p id="noActivitiesMessage" style="display:none; color: red; text-align: center;">No activities available for the selected regulation.</p>
+    
+        <table id="activityTable" style="display:none; margin-top: 20px;">
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Activity Name</th>
+                </tr>
+            </thead>
+            <tbody id="activityBody"></tbody>
+        </table>
+    
+        <div class="buttons">
+            <input type="button" value="Delete Selected" onclick="showConfirmation()">
+            <input type="button" value="Back" class="back-button" onclick="window.location.href='/global_admin_dashboard';">
+        </div>
+    </div>
+
+    <div class="image-container">
+        <img src="static/images/bg_12.png" alt="Person filling form" class="form-filling-image2">
+    </div>
+    
+    <!-- Include jQuery and Select2 JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
+    <!-- Hidden divs to store success and error messages -->
+    <div id="error-type" style="display:none;">
+        {% if error_type %}
+            {{ error_type }}
+        {% endif %}
+    </div>
+
+    <div id="remarks" style="display:none;">
+        {% if remarks %}
+            {{ remarks }}
+        {% endif %}
+    </div>
+
+    <!-- Custom Confirmation Modal -->
+    <div id="custom-confirm-overlay">
+        <div id="custom-confirm-popup">
+            <h3>Are you sure you want to delete the selected regulations?</h3>
+            <div class="confirm-buttons">
+                <button id="confirm-yes" onclick="confirmDelete()">Yes</button> <!-- Corrected function name here -->
+                <button id="confirm-no" onclick="closeConfirmationModal()">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup overlay and content -->
+    <div class="overlay" id="overlay" style="display: none;"></div>
+    <div class="popup" id="popup" style="display: none;">
+        <div id="popup-icon"></div>
+        <h2 id="popup-title"></h2>
+        <p id="popup-message"></p>
+        <button onclick="closePopup()" id="popup-button">Continue</button>
+    </div>
+
+    <!-- Load the popup.js script -->
+    <script src="{{ url_for('static', filename='js/popup.js') }}"></script>
+
+    <script>
+        // Function to show the pop-up
+        function showPopup(type, message) {
+            const popup = document.getElementById('popup');
+            const overlay = document.getElementById('overlay');
+            const popupIcon = document.getElementById('popup-icon');
+            const popupTitle = document.getElementById('popup-title');
+            const popupMessage = document.getElementById('popup-message');
+            const popupButton = document.getElementById('popup-button');
+    
+            popup.classList.remove('success', 'error', 'warning');
+    
+            // Customize the popup based on the type (success, error, warning)
+            switch (type.toLowerCase()) {
+                case 's':
+                    popup.classList.add('success');
+                    popupIcon.innerHTML = '✔';
+                    popupTitle.textContent = 'SUCCESS';
+                    popupButton.style.backgroundColor = '#4CAF50';
+                    break;
+                case 'e':
+                    popup.classList.add('error');
+                    popupIcon.innerHTML = '❌';
+                    popupTitle.textContent = 'ERROR';
+                    popupButton.style.backgroundColor = '#f44336';
+                    break;
+                case 'w':
+                    popup.classList.add('warning');
+                    popupIcon.innerHTML = '⚠';
+                    popupTitle.textContent = 'WARNING';
+                    popupButton.style.backgroundColor = '#ff9800';
+                    break;
+                default:
+                    console.warn("Unknown popup type");
+                    return;
+            }
+    
+            popupMessage.textContent = message;
+            popup.style.display = 'block';
+            overlay.style.display = 'block';
+        }
+    
+        // Function to close the pop-up
+        function closePopup() {
+            document.getElementById('popup').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+    
+        // Function to check for messages and display the appropriate pop-up
+        function checkMessages() {
+            const errorType = document.getElementById('error-type') ? document.getElementById('error-type').innerText.trim() : '';
+            const remarks = document.getElementById('remarks') ? document.getElementById('remarks').innerText.trim() : '';
+    
+            if (errorType && remarks) {
+                showPopup(errorType, remarks);
+            }
+        }
+    
+        $(document).ready(function() {
+            $('.searchable-dropdown').select2();
+            checkMessages();
+        });
+    
+        window.onload = function() {
+            fetch('/populate_main_regulations')
+                .then(response => response.json())
+                .then(data => {
+                    const regulationSelect = document.getElementById('regulationSelect');
+                    data.forEach(regulation => {
+                        const option = document.createElement('option');
+                        option.value = regulation.regulation_id;
+                        option.textContent = regulation.regulation_name;
+                        regulationSelect.appendChild(option);
+                    });
+                    $('#regulationSelect').trigger('change');
+                });
+        }
+    
+        function fetchActivities() {
+            const regulationId = document.getElementById('regulationSelect').value;
+            if (regulationId) {
+                fetch(`/load_main_activities/${regulationId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const activityTable = document.getElementById('activityTable');
+                        const activityBody = document.getElementById('activityBody');
+                        activityBody.innerHTML = '';
+                        const noActivitiesMessage = document.getElementById('noActivitiesMessage');
+    
+                        if (data.length > 0) {
+                            activityTable.style.display = 'table';
+                            noActivitiesMessage.style.display = 'none';
+                            data.forEach(activity => {
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                                    <td><input type="checkbox" name="activity_ids" value="${activity.activity_id}"></td>
+                                    <td>${activity.activity}</td>
+                                `;
+                                activityBody.appendChild(row);
+                            });
+                        } else {
+                            activityTable.style.display = 'none';
+                            noActivitiesMessage.style.display = 'block';
+                        }
+                    });
+            }
+        }
+    
+        function showConfirmation() {
+            document.getElementById('custom-confirm-overlay').style.display = 'flex';
+        }
+    
+        function closeConfirmationModal() {
+            document.getElementById('custom-confirm-overlay').style.display = 'none';
+        }
+    
+        function confirmDelete() {
+            closeConfirmationModal();
+            const regulationId = document.getElementById('regulationSelect').value;
+            const selectedIds = Array.from(document.querySelectorAll('input[name="activity_ids"]:checked'))
+                                      .map(checkbox => checkbox.value);
+    
+            if (selectedIds.length === 0) {
+                showPopup('w', 'Please select at least one activity to delete.');
+                return;
+            }
+    
+            const formData = new FormData();
+            formData.append("regulation_id", regulationId);
+            selectedIds.forEach(id => formData.append("activity_ids", id));
+    
+            fetch("/delete_main_activities", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                const errorType = doc.getElementById('error-type') ? doc.getElementById('error-type').innerText.trim() : '';
+            const remarks = doc.getElementById('remarks') ? doc.getElementById('remarks').innerText.trim() : '';
+
+            console.log(errorType,remarks)
+
+                if (errorType && remarks) {
+            showPopup(errorType, remarks);
+
+
+                    // If successful, redirect after showing the success message briefly
+                    if (errorType === 's') {
+                        setTimeout(() => {
+                            window.location.href = '/delete_main_activities_page';
+                        }, 20000); // 2-second delay before redirecting (optional)
+                    }
+                } else {
+                    // Only show generic error if both elements are missing
+                    showPopup('e', 'An unknown error occurred. Please try again.');
+                }
+            })
+            .catch(error => {
+                showPopup('e', 'An error occurred: ' + error.message);
+            });
+
+        };
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,133 @@
+body {
+    background: linear-gradient(to right, #1E90FF, #87CEEB); /* Blue gradient */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    position: relative; /* Necessary for the bubbles to be placed relative to the body */
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+
+}
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: left;
+            overflow: auto;
+            margin-left: 10%;
+        }
+        /* Display the entity_id and user_id */
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .form-header .entity-id,
+        .form-header .user-id {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .form-header strong {
+            font-weight: bold; /* Making the labels bold */
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+            color: #4a4a4a;
+        }
+
+        .form-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            width: 30%;
+        }
+
+        input[type="text"], input[type="button"] {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            width: 65%;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .buttons input[type="button"] {
+            padding: 12px;
+            width: 48%;
+            border: none;
+            color: #fff;
+            background-color: #1E90FF;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        input[type="button"]:hover {
+            background-color: #007ACC;
+        }
+
+        .back-button {
+            background-color: #f0ad4e;
+        }
+
+        .back-button:hover {
+            background-color: #ec971f;
+        }
+
+        .fetch-btn {
+            background-color: #1E90FF;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .fetch-btn:hover {
+            background-color: #007ACC;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .input-group input {
+            flex: 1;
+        }
+
+        .input-group .fetch-btn {
+            width: auto;
+        }
+
+        .image-container {
+            max-width: 500px;
+            width: 130%;
+            margin-right: 15%;
+        }
+        
+        .image-container img {
+            max-width: 130%;
+            border-radius: 15px;
+        }

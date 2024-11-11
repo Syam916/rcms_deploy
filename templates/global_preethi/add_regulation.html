@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Regulation</title>
+    <link rel="stylesheet" href="static/css/Global/regulation.css">
+    <link rel="stylesheet" href="static/css/pop_up.css"> <!-- Include your custom popup CSS -->
+</head>
+<body>
+    <!-- Bubbles -->
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+
+    <div class="container">
+        <div class="form-container">
+            <h1>Add Regulation</h1>
+            <form action="/add-regulation" method="POST">
+                <label for="categoryID">Category:</label>
+                <select id="categoryID" name="categoryID" required>
+                    <option value="">Select Category</option>
+                    {% for category in categories %}
+                        <option value="{{ category[0] }}">{{ category[1] }}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="regulationName">Regulation Name:</label>
+                <input type="text" id="regulationName" name="regulationName" required>
+
+                <label for="regulatoryBody">Regulatory Body:</label>
+                <input type="text" id="regulatoryBody" name="regulatoryBody">
+
+                <!-- Internal/External and National/International in one row -->
+                <div class="row">
+                    <div class="column">
+                        <label for="internalExternal">Internal/External:</label>
+                        <select id="internalExternal" name="internalExternal" required>
+                            <option value="">Select Option</option>
+                            <option value="I">Internal</option>
+                            <option value="E">External</option>
+                        </select>
+                    </div>
+
+                    <div class="column">
+                        <label for="nationalInternational">National/International:</label>
+                        <select id="nationalInternational" name="nationalInternational" required>
+                            <option value="">Select Option</option>
+                            <option value="N">National</option>
+                            <option value="I">International</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Mandatory/Optional and Effective From in one row -->
+                <div class="row">
+                    <div class="column">
+                        <label for="mandatoryOptional">Mandatory/Optional:</label>
+                        <select id="mandatoryOptional" name="mandatoryOptional" required>
+                            <option value="">Select Option</option>
+                            <option value="M">Mandatory</option>
+                            <option value="O">Optional</option>
+                        </select>
+                    </div>
+
+                    <div class="column">
+                        <label for="effectiveFrom">Effective From:</label>
+                        <input type="date" id="effectiveFrom" name="effectiveFrom" required>
+                    </div>
+                </div>
+
+                <label for="obsoleteCurrent">Obsolete/Current:</label>
+                <select id="obsoleteCurrent" name="obsoleteCurrent" required>
+                    <option value="">Select Option</option>
+                    <option value="O">Obsolete</option>
+                    <option value="C">Current</option>
+                </select>
+
+                <div class="buttons">
+                    <input type="submit" value="Submit">
+                    <input type="button" value="Back" onclick="window.location.href='/global_admin_dashboard';">
+                </div>
+            </form>
+        </div>
+
+        <!-- Right side: Image -->
+        <div class="image-container">
+            <img src="static/images/bg_12.png" alt="Regulation Image" class="form-filling-image">
+        </div>
+    </div>
+
+    <!-- Hidden divs to store success and error messages -->
+    <div id="success-message" style="display:none;">
+        {% if success_message %}
+            {{ success_message }}
+        {% endif %}
+    </div>
+
+    <div id="error-message" style="display:none;">
+        {% if error_message %}
+            {{ error_message }}
+        {% endif %}
+    </div>
+
+    <!-- Popup overlay and content -->
+    <div class="overlay" id="overlay" style="display: none;"></div>
+    <div class="popup" id="popup" style="display: none;">
+        <div id="popup-icon"></div>
+        <h2 id="popup-title"></h2>
+        <p id="popup-message"></p>
+        <button onclick="closePopup()" id="popup-button">Continue</button>
+    </div>
+
+    <!-- Load the popup.js script -->
+    <script src="{{ url_for('static', filename='js/popup.js') }}"></script>
+
+    <script>
+        // Automatically check and display the pop-up if messages exist
+        checkMessages();
+    </script>
+</body>
+</html>

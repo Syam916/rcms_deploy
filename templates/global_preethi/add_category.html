@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Category</title>
+    <!-- Link to external CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="static/css/Global/add_category.css">
+
+</head>
+<body>
+    <div class="form-container">
+        <h1>Add Category</h1>
+        <form action="/submit-category" method="POST">
+            <div class="form-group">
+                <label for="categoryType">Category Name:</label>
+                <input type="text" id="categoryType" name="categoryType" required>
+            </div>
+
+            <div class="form-group">
+                <label for="remarks">Category Description:</label>
+                <textarea id="remarks" name="remarks" rows="4" required></textarea>
+            </div>
+
+            <div class="buttons">
+                <input type="submit" value="Submit">
+                <input type="button" value="Back" onclick="window.location.href='/global_admin_dashboard';">
+            </div>                        
+        </form>
+    </div>
+
+    <!-- Modal Structure -->
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Notification</h2>
+            <p id="modalMessage">Some message...</p>
+        </div>
+    </div>
+
+    <script>
+        // This role will be passed from the backend (Flask/Django) to the template
+        const userRole = "{{ user_role }}";  // Assume user_role is passed by the backend
+    
+    
+        // Function to open the modal and display a message
+        function showModal(message) {
+            document.getElementById('modalMessage').textContent = message;
+            const modal = document.getElementById("messageModal");
+            modal.style.display = "flex"; // Display modal as flexbox
+        }
+    
+        // Function to close the modal
+        function closeModal() {
+            const modal = document.getElementById("messageModal");
+            modal.style.display = "none";
+        }
+    
+        // Add event listener for clicking outside of the modal to close it
+        window.onclick = function(event) {
+            const modal = document.getElementById("messageModal");
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    
+        document.addEventListener('DOMContentLoaded', function() {
+            const errorMessage = "{{ error_message | default('') | e }}";
+            const successMessage = "{{ success_message | default('') | e }}";
+    
+            if (errorMessage && errorMessage !== "None") {
+                showModal(errorMessage);
+            } else if (successMessage && successMessage !== "None") {
+                showModal(successMessage);
+            }
+        });
+    </script>     
+</body>
+</html>

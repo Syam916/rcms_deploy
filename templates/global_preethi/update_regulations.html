@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Regulation</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- Include SweetAlert -->
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #71b7e6, #9b59b6);
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+        /* Display the entity_id and user_id */
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .form-header .entity-id,
+        .form-header .user-id {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .form-header strong {
+            font-weight: bold; /* Making the labels bold */
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+        }
+        input[type="text"], select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px; /* Spacing between fields */
+            margin-bottom: 20px;
+        }
+        .form-row .form-group {
+            flex: 1;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center; /* Center align buttons */
+            gap: 10px; /* Space between buttons */
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px; /* Adjust button padding */
+            background-color: #5cb85c;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #4cae4c;
+        }
+        .fetch-btn {
+            padding: 10px 20px; /* Adjust Fetch button size */
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Displaying Entity ID and User ID at the top of the form -->
+         <div class="form-header">
+            <div class="entity-id"><strong>Entity ID:</strong> {{ entity_id }}</div>
+            <div class="user-id"><strong>User ID:</strong> {{ user_id }}</div>
+        </div>
+        <h1>Edit Regulation</h1>
+        <!-- Flash messages for errors/success -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        <script>
+                            Swal.fire({
+                                icon: "{{ 'success' if category == 'success' else 'error' }}",
+                                title: "{{ message }}"
+                            });
+                        </script>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Regulation Fetch Form -->
+        <form method="POST" action="{{ url_for('fetch_main_regulation') }}">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="regulationName">Enter Regulation Name:</label>
+                    <input type="text" id="regulationName" name="regulation_name" value="{{ regulation.regulation_name if regulation else '' }}" placeholder="Enter regulation name" required />
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label> <!-- Placeholder to align button with input -->
+                    <button type="submit" class="fetch-btn" name="fetch_regulation">Fetch Regulation</button>
+                    <!-- Back Button -->
+                    <button type="button" class="back-btn" onclick="window.location.href='/global_admin_dashboard';">Back</button>
+                </div>
+            </div>
+        </form>
+
+        {% if regulation %}
+        <!-- Display form when the regulation is fetched -->
+        <form method="POST" action="{{ url_for('update_main_regulation') }}">
+            <!-- Regulation ID and Category ID (side by side) -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="regulationId">Regulation ID:</label>
+                    <input type="text" id="regulationId" name="regulation_id" value="{{ regulation.regulation_id }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="categoryId">Category ID:</label>
+                    <input type="text" id="categoryId" name="category_id" value="{{ regulation.category_id }}" readonly>
+                </div>
+            </div>
+
+            <!-- Regulatory Body and Internal/External (side by side) -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="regulatoryBody">Regulatory Body:</label>
+                    <input type="text" id="regulatoryBody" name="regulatory_body" value="{{ regulation.regulatory_body }}">
+                </div>
+                <div class="form-group">
+                    <label for="internalExternal">Internal/External:</label>
+                    <select id="internalExternal" name="internal_external">
+                        <option value="I" {% if regulation.internal_external == 'I' %}selected{% endif %}>Internal</option>
+                        <option value="E" {% if regulation.internal_external == 'E' %}selected{% endif %}>External</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- National/International and Mandatory/Optional (side by side) -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="nationalInternational">National/International:</label>
+                    <select id="nationalInternational" name="national_international">
+                        <option value="N" {% if regulation.national_international == 'N' %}selected{% endif %}>National</option>
+                        <option value="I" {% if regulation.national_international == 'I' %}selected{% endif %}>International</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="mandatoryOptional">Mandatory/Optional:</label>
+                    <select id="mandatoryOptional" name="mandatory_optional">
+                        <option value="M" {% if regulation.mandatory_optional == 'M' %}selected{% endif %}>Mandatory</option>
+                        <option value="O" {% if regulation.mandatory_optional == 'O' %}selected{% endif %}>Optional</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Effective From and Obsolete/Current (side by side) -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="effectiveFrom">Effective From:</label>
+                    <input type="text" id="effectiveFrom" name="effective_from" value="{{ regulation.effective_from }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="obsoleteCurrent">Obsolete/Current:</label>
+                    <select id="obsoleteCurrent" name="obsolete_current">
+                        <option value="Current" {% if regulation.obsolete_current == 'Current' %}selected{% endif %}>Current</option>
+                        <option value="Obsolete" {% if regulation.obsolete_current == 'Obsolete' %}selected{% endif %}>Obsolete</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Buttons aligned at the center -->
+            <div class="buttons">
+                <button type="submit" name="update_regulation">Update Regulation</button>
+            </div>
+        </form>
+        {% endif %}
+    </div>
+</body>
+</html>

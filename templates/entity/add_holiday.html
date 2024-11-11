@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Holiday</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pop-up.css') }}">
+    <style>
+        /* Centering the single holiday form */
+        .single-holiday-form {
+            background-color: #f8f8f8;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 300px; /* Set a fixed width for the form */
+            margin: 20px auto; /* Center horizontally and add margin */
+        }
+ 
+        /* Reduce the size of single holiday input fields */
+        .single-holiday-form .form-group input {
+            width: 100%; /* Full width within the form */
+            padding: 5px;
+            font-size: 14px;
+        }
+ 
+        /* Centering the buttons */
+        .button-group {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center; /* Center the button horizontally */
+            width: 100%;
+        }
+ 
+        /* Additional styles for the button */
+        .button-group button {
+            padding: 10px 20px; /* Adjust button padding */
+        }
+        /* Display the entity_id and user_id */
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .form-header .entity-id,
+        .form-header .user-id {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .form-header strong {
+            font-weight: bold; /* Making the labels bold */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Displaying Entity ID and User ID at the top of the form -->
+        <div class="form-header">
+            <div class="entity-id"><strong>Entity ID:</strong> {{ entity_id }}</div>
+            <div class="user-id"><strong>User ID:</strong> {{ user_id }}</div>
+        </div>
+        
+        <h2>Add Holidays</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul class="flashes">
+              {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+ 
+        <!-- Form to add multiple holidays at once -->
+        <form action="/add-holiday" method="POST">
+            <table class="holiday-table">
+                <thead>
+                    <tr>
+                        <th>Holiday Date</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in range(12) %}
+                    <tr>
+                        <td>
+                            <input type="date" id="holiday_date_{{ i }}" name="holiday_date_{{ i }}">
+                        </td>
+                        <td>
+                            <input type="text" id="description_{{ i }}" name="description_{{ i }}">
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="button-group">
+                <button type="submit" class="button small-button" name="submit_type" value="multiple">Add Holidays</button>
+            </div>
+        </form>
+ 
+        <!-- Centered form for adding a single holiday -->
+        <form action="{{ url_for('add_holiday') }}" method="post" autocomplete="off" class="single-holiday-form">
+            <div class="form-group">
+                <label for="holiday_date_single">Holiday Date:</label>
+                <input type="date" id="holiday_date_single" name="holiday_date_single" required>
+            </div>
+            <div class="form-group">
+                <label for="description_single">Description:</label>
+                <input type="text" id="description_single" name="description_single" required>
+            </div>
+            <div class="button-group">
+                <button type="submit" class="button small-button" name="submit_type" value="single">Add Holiday</button>
+                <a href="{{ url_for('entity_admin_dashboard') }}" class="button small-button">Back</a>
+            </div>
+        </form>
+ 
+    </div>
+
+    <!-- Hidden divs to store success and error messages -->
+    <div id="success-message" style="display:none;">
+        {% if success_message %}
+            {{ success_message }}
+        {% endif %}
+    </div>
+
+    <div id="error-message" style="display:none;">
+        {% if error_message %}
+            {{ error_message }}
+        {% endif %}
+    </div>
+
+    <!-- Popup overlay and content -->
+    <div class="overlay" id="overlay" style="display: none;"></div>
+    <div class="popup" id="popup" style="display: none;">
+        <div id="popup-icon"></div>
+        <h2 id="popup-title"></h2>
+        <p id="popup-message"></p>
+        <button onclick="closePopup()" id="popup-button">Continue</button>
+    </div>
+
+    <!-- Load the popup.js script -->
+    <script src="{{ url_for('static', filename='js/popup.js') }}"></script>
+
+    <script>
+        checkMessages()
+    </script>
+</body>
+</html>

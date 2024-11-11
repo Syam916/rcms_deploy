@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Global Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        /* Additional styling for the menu */
+
+        html , body{
+            margin: 0;
+            padding: 0;
+            overflow-y: hidden;
+            margin-top: -35px;
+        }
+        .menu-button {
+           margin-top: 50px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+ 
+        .menu-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+ 
+        .menu-dropdown a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+ 
+        .menu-dropdown a:hover {
+            background-color: #f1f1f1;
+        }
+ 
+        .menu-container:hover .menu-dropdown {
+            display: block;
+        }
+ 
+      
+ 
+        .header {
+            display: flex;
+            justify-content: space-between; /* Space out the title and menu button */
+            align-items: center;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 20px; /* Padding to create space around the header elements */
+            box-sizing: border-box; /* Ensure padding is included in the width */
+        }
+ 
+        .header h2 {
+            margin: 0;
+            text-align: center;
+            flex-grow: 1; /* Allow the title to grow and center itself */
+        }
+    </style>
+</head>
+<body>
+    <div class="container dashboard-container">
+        <div class="header">
+            <h2></h2>
+            <!-- Menu Button positioned at the top right corner -->
+            <div class="menu-container">
+                <button class="menu-button">Menu</button>
+                <div class="menu-dropdown">
+                    <a href="{{ url_for('add_category') }}" class="action-button">Add Category</a>
+                    <a href="{{ url_for('add_entity') }}" class="action-button">Add Entity</a>
+                    <a href="{{ url_for('add_regulation') }}" class="action-button">Add Regulation</a>
+                    <a href="{{ url_for('add_activity') }}" class="action-button">Add Activity</a>
+                </div>                 
+            </div>
+        </div>
+
+        <iframe src="/admin-dashboard/" style="width: 100%; height: 200%; border: none;" frameborder="0"></iframe>
+        <!-- Additional content can go here -->
+    </div>
+
+    
+</body>
+</html>

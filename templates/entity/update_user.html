@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update User</title>
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bubble.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/entity/update_user.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pop-up.css') }}">
+    <style>
+        /* Style for readonly fields */
+        input[readonly], select[readonly] {
+            background-color: #f0f0f0; /* Light grey background */
+            color: #555; /* Slightly darker text color */
+            border: 1px solid #ccc; /* Add border to match other input fields */
+            cursor: not-allowed; /* Change cursor to indicate it's not editable */
+        }
+    </style>
+
+</head>
+<body>
+
+    <!-- Bubbles -->
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="container">
+        <!-- Displaying Entity ID and User ID at the top of the form -->
+        <div class="form-header">
+            <div class="entity-id"><strong>Entity ID:</strong> {{ user_entity_id }}</div>
+            <div class="user-id"><strong>User ID:</strong> {{ user_user_id }}</div>
+        </div>
+        <h1>Update User</h1>
+
+        <div class="form-group input-group">
+            <label for="user_id">User ID:</label>
+            <input type="text" id="user_id" placeholder="Enter User ID" required>
+            <button type="button" class="fetch-btn" onclick="fetchUserDetails()">Fetch User</button>
+        </div>
+
+        <div class="form-group">
+            <label for="entity_id">Entity ID:</label>
+            <input type="text" id="entity_id" readonly>
+        </div>
+
+        <div class="form-group">
+            <label for="user_name">User Name:</label>
+            <input type="text" id="user_name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="address">Address:</label>
+            <input type="text" id="address" required>
+        </div>
+
+        <div class="form-group">
+            <label for="mobile_no">Mobile No:</label>
+            <input type="text" id="mobile_no" required>
+        </div>
+
+        <div class="form-group">
+            <label for="email_id">Email ID:</label>
+            <input type="text" id="email_id" required>
+        </div>
+
+        <div class="form-group">
+            <label for="role">Role:</label>
+            <input type="text" id="role" readonly required>
+        </div>
+
+        <div class="buttons">
+            <input type="button" value="Update User" onclick="confirmUpdateUser()">
+            <input type="button" value="Back" class="back-button" onclick="window.location.href='/entity_admin_dashboard';">
+        </div>
+
+        <!-- Right side: Image -->
+        
+    </div>
+
+    <div class="image-container">
+        <img src="static/images/bg_12.png" alt="Regulation Image" class="form-filling-image">
+    </div>
+
+    <!-- Hidden divs to store success and error messages -->
+    <div id="success-message" style="display:none;">
+        {% if success_message %}
+            {{ success_message }}
+        {% endif %}
+    </div>
+
+    <div id="error-message" style="display:none;">
+        {% if error_message %}
+            {{ error_message }}
+        {% endif %}
+    </div>
+
+    <!-- Popup overlay and content -->
+    <div class="overlay" id="overlay" style="display: none;"></div>
+    <div class="popup" id="popup" style="display: none;">
+        <div id="popup-icon"></div>
+        <h2 id="popup-title"></h2>
+        <p id="popup-message"></p>
+        <button onclick="closePopup()" id="popup-button">Continue</button>
+    </div>
+
+    <!-- Load the popup.js script -->
+    <script src="{{ url_for('static', filename='js/popup.js') }}"></script>
+
+    <script>
+        checkMessages()
+        function fetchUserDetails() {
+            const userId = document.getElementById('user_id').value;
+            fetch(`/load_entity_user/${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.error
+                        });
+                    } else {
+                        document.getElementById('entity_id').value = data.entity_id;
+                        document.getElementById('user_name').value = data.user_name;
+                        document.getElementById('address').value = data.address;
+                        document.getElementById('mobile_no').value = data.mobile_no;
+                        document.getElementById('email_id').value = data.email_id;
+                        document.getElementById('role').value = data.role;
+                    }
+                });
+        }
+
+        function confirmUpdateUser() {
+            const userId = document.getElementById('user_id').value;
+            const userName = document.getElementById('user_name').value;
+            const address = document.getElementById('address').value;
+            const mobileNo = document.getElementById('mobile_no').value;
+            const emailId = document.getElementById('email_id').value;
+
+            if (!userId || !userName || !address || !mobileNo || !emailId) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Please fill in all required fields'
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to update this user's details?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, update it!',
+                cancelButtonText: 'No, cancel!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const formData = new FormData();
+                    formData.append('user_id', userId);
+                    formData.append('user_name', userName);
+                    formData.append('address', address);
+                    formData.append('mobile_no', mobileNo);
+                    formData.append('email_id', emailId);
+
+                    fetch('/update_entity_user', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.message) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Updated!',
+                                text: data.message
+                            }).then(() => {
+                                // Clear all fields after successful update
+                                document.getElementById('user_id').value = '';
+                                document.getElementById('entity_id').value = '';
+                                document.getElementById('user_name').value = '';
+                                document.getElementById('address').value = '';
+                                document.getElementById('mobile_no').value = '';
+                                document.getElementById('email_id').value = '';
+                                document.getElementById('role').value = '';
+                            });
+                        } else if (data.error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: data.error
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+</html>

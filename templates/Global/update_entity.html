@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Entity</title>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pop-up.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bubble.css') }}">
+    <style>
+        body {
+            background: linear-gradient(to right, #1E90FF, #87CEEB); /* Blue gradient */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            position: relative; /* Necessary for the bubbles to be placed relative to the body */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .image-container {
+            max-width: 500px;
+            width: 130%;
+            margin-right: 15%;
+        }
+
+        .image-container img {
+            max-width: 130%;
+            border-radius: 15px;
+        }
+
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: left;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+        }
+
+        input[readonly] {
+            background-color: #f2f2f2;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px; /* Add space between the columns */
+            margin-bottom: 20px; /* Add space between rows */
+        }
+
+        .column {
+            flex: 1;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            gap: 20px; /* Add some gap between the buttons */
+        }
+
+        .buttons input {
+            padding: 8px 16px;  /* Reduce the size of the buttons */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 17px;  /* Adjust the font size for smaller buttons */
+            width: 120px;  /* Set a fixed width for the buttons */
+        }
+
+        .update-button {
+            background-color: #1E90FF;
+            color: white;
+        }
+
+        .back-button {
+            background-color: #1E90FF;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="container">
+        <!-- Displaying Entity ID and User ID at the top of the form -->
+        <div class="form-header">
+            <div class="entity-id"><strong>Entity ID:</strong> {{ entity_id }}</div>
+            <div class="user-id"><strong>User ID:</strong> {{ user_id }}</div>
+        </div>
+        <h1>Update Entity</h1>
+        <form id="updateEntityForm">
+            <!-- Entity Dropdown and ID aligned in a vertical row -->
+            <div class="entity-row">
+                <label for="entitySelect">Select Entity Name:</label>
+                <select id="entitySelect" style="width: 100%" required></select>
+            </div>
+            <div class="entity-row">
+                <label for="entity_id">Entity ID:</label>
+                <input type="text" id="entity_id" name="entity_id" readonly>
+            </div>
+        
+            <!-- Editable fields in pairs -->
+            <div class="row">
+                <div class="column">
+                    <label for="contact_phno">Contact Phone:</label>
+                    <input type="text" id="contact_phno" name="contact_phno" required>
+                </div>
+                <div class="column">
+                    <label for="alternate_contact">Alternate Contact:</label>
+                    <input type="text" id="alternate_contact" name="alternate_contact">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="column">
+                    <label for="description">Description:</label>
+                    <input type="text" id="description" name="description">
+                </div>
+                <div class="column">
+                    <label for="country">Country:</label>
+                    <input type="text" id="country" name="country" required>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="column">
+                    <label for="contact_name">Contact Name:</label>
+                    <input type="text" id="contact_name" name="contact_name" required>
+                </div>
+                <div class="column">
+                    <label for="alternate_contact_name">Alternate Contact Name:</label>
+                    <input type="text" id="alternate_contact_name" name="alternate_contact_name">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="column">
+                    <label for="state">State:</label>
+                    <input type="text" id="state" name="state" required>
+                </div>
+                <div class="column">
+                    <label for="pincode">Pincode:</label>
+                    <input type="text" id="pincode" name="pincode" required>
+                </div>
+            </div>
+        
+            <!-- Buttons -->
+            <div class="buttons">
+                <input type="submit" class="update-button" value="Update">
+                <input type="button" class="back-button" value="Back" onclick="window.location.href='/global_admin_dashboard';">
+            </div>
+        </form>        
+    </div>
+    <div class="image-container">
+        <img src="static/images/bg_12.png" alt="Person filling form" class="form-filling-image2">
+    </div>
+    <div id="error-type" style="display:none;">
+        {% if error_type %}
+            {{ error_type }}
+        {% endif %}
+    </div>
+
+    <div id="remarks" style="display:none;">
+        {% if remarks %}
+            {{ remarks }}
+        {% endif %}
+    </div>
+
+    <!-- Popup overlay and content -->
+    <div class="overlay" id="overlay" style="display: none;"></div>
+    <div class="popup" id="popup" style="display: none;">
+        <div id="popup-icon"></div>
+        <h2 id="popup-title"></h2>
+        <p id="popup-message"></p>
+        <button onclick="closePopup()" id="popup-button">Continue</button>
+    </div>
+
+    <!-- Load the popup.js script -->
+    <script src="{{ url_for('static', filename='js/popup.js') }}"></script>
+
+    <!-- Include jQuery and Select2 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        // Check and display pop-ups based on error_type and remarks
+        function checkMessages() {
+            const errorType = document.getElementById('error-type') ? document.getElementById('error-type').innerText.trim() : '';
+            const remarks = document.getElementById('remarks') ? document.getElementById('remarks').innerText.trim() : '';
+
+            console.log("Checking messages... Error Type:", errorType, "Remarks:", remarks); // Debugging output
+
+            if (errorType && remarks) {
+                showPopup(errorType, remarks); // Show the appropriate pop-up
+            }
+        }
+
+        // Populate entity dropdown
+        function fetchEntities() {
+            fetch('/get_entities')
+                .then(response => response.json())
+                .then(entities => {
+                    const entitySelect = $('#entitySelect');
+                    entitySelect.empty().append('<option value="">Select Entity</option>');
+                    entities.forEach(entity => {
+                        entitySelect.append(`<option value="${entity.entity_id}">${entity.entity_name}</option>`);
+                    });
+                    entitySelect.select2({ placeholder: 'Search or Select Entity' });
+                });
+        }
+
+        // Fetch and display entity details
+        $('#entitySelect').on('change', function() {
+            const entityId = $(this).val();
+            if (entityId) {
+                fetch(`/get_entity_details/${entityId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        $('#entity_id').val(data.entity_id);
+                        $('#contact_phno').val(data.contact_phno);
+                        $('#alternate_contact').val(data.alternate_contact);
+                        $('#description').val(data.description);
+                        $('#country').val(data.country);
+                        $('#contact_name').val(data.contact_name);
+                        $('#alternate_contact_name').val(data.alternate_contact_name);
+                        $('#state').val(data.state);
+                        $('#pincode').val(data.pincode);
+                    });
+            }
+        });
+
+        // Handle form submission
+        document.getElementById("updateEntityForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const formData = $(this).serialize();
+            fetch('/update_entity', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData
+            })
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                // Retrieve updated errorType and remarks
+                const errorType = doc.getElementById('error-type') ? doc.getElementById('error-type').innerText.trim() : '';
+                const remarks = doc.getElementById('remarks') ? doc.getElementById('remarks').innerText.trim() : '';
+
+                console.log("Response received. Error Type:", errorType, "Remarks:", remarks); // Debugging output
+
+                // Update hidden divs on the current page
+                document.getElementById('error-type').innerText = errorType;
+                document.getElementById('remarks').innerText = remarks;
+
+                // Display pop-up if needed
+                checkMessages();
+            })
+            .catch(error => {
+                console.error("Fetch error:", error); // Debugging output for errors
+                showPopup('e', 'An error occurred: ' + error.message);
+            });
+        });
+
+        // Initialize entities and check messages on page load
+        window.onload = () => {
+            fetchEntities();
+            checkMessages();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Category</title>
+    
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bubble.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pop-up.css') }}">
+    
+    <style>
+        /* Global Styling */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            background: linear-gradient(to right, #1E90FF, #87CEEB); /* Blue gradient */
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            padding-top: 20px;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+            text-align: left;
+            overflow: auto;
+            margin-left: 10%;
+        }
+
+        /* Display the entity_id and user_id */
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .form-header .entity-id,
+        .form-header .user-id {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .form-header strong {
+            font-weight: bold; /* Making the labels bold */
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+            color: #4a4a4a;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        input[type="button"], input[type="submit"] {
+            padding: 12px 20px;
+            border: none;
+            color: #fff;
+            background-color: #5cb85c;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        input[type="button"]:hover, input[type="submit"]:hover {
+            background-color: #4cae4c;
+        }
+
+        .back-button {
+            background-color: #f0ad4e;
+        }
+
+        .back-button:hover {
+            background-color: #ec971f;
+        }
+
+        /* Search bar styling */
+        #searchInput {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .modal .buttons {
+            display: flex;
+            justify-content: space-around;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .modal .buttons input[type="button"] {
+            padding: 12px 20px;
+            border: none;
+            color: #fff;
+            background-color: #5cb85c;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 40%;
+        }
+
+        .modal .buttons input[type="button"]:hover {
+            background-color: #4cae4c;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .small-swal-popup {
+            font-size: 14px;
+            padding: 15px;
+        }
+
+        .small-swal-title {
+            font-size: 16px;
+        }
+
+        .small-swal-button {
+            font-size: 14px;
+            padding: 5px 10px;
+        }
+        .image-container {
+            max-width: 500px;
+            width: 130%;
+            margin-right: 15%;
+        }
+        
+        .image-container img {
+            max-width: 130%;
+            border-radius: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+
+    <div class="container">
+        <!-- Displaying Entity ID and User ID at the top of the form -->
+        <div class="form-header">
+            <div class="entity-id"><strong>Entity ID:</strong> {{ entity_id }}</div>
+            <div class="user-id"><strong>User ID:</strong> {{ user_id }}</div>
+        </div>
+
+        <h1>Delete Category</h1>
+
+        <!-- Search Input -->
+        <input type="text" id="searchInput" onkeyup="searchFunction()" placeholder="Search for Category Type...">
+
+        <form id="categoryForm" action="/delete_entity_category" method="post">
+            <table id="categoryTable">
+                <thead>
+                    <tr>
+                        <th>Select</th>
+                        <th>Category ID</th>
+                        <th>Category Type</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for index, category in enumerate(categories, start=1) %}
+                    <tr>
+                        <td><input type="checkbox" name="category_ids" value="{{ category['category_id'] }}"></td>
+                        <td>{{ index }}</td>
+                        <td>{{ category['category_type'] }}</td>
+                        <td>{{ category['Remarks'] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="buttons">
+                <input type="submit" value="Delete Selected" onclick="openModal()">
+                <input type="button" value="Back" class="back-button" onclick="window.location.href='/entity_admin_dashboard';">
+            </div>
+        </form>
+    </div>
+
+
+    <div class="image-container">
+        <img src="static/images/bg_12.png" alt="Regulation Image" class="form-filling-image">
+    </div>
+
+    <!-- Hidden divs to store success and error messages -->
+    <div id="success-message" style="display:none;">
+        {% if success_message %}
+            {{ success_message }}
+        {% endif %}
+    </div>
+
+    <div id="error-message" style="display:none;">
+        {% if error_message %}
+            {{ error_message }}
+        {% endif %}
+    </div>
+
+    <!-- Popup overlay and content -->
+    <div class="overlay" id="overlay" style="display: none;"></div>
+    <div class="popup" id="popup" style="display: none;">
+        <div id="popup-icon"></div>
+        <h2 id="popup-title"></h2>
+        <p id="popup-message"></p>
+        <button onclick="closePopup()" id="popup-button">Continue</button>
+    </div>
+
+    <!-- Load the popup.js script -->
+    <script src="{{ url_for('static', filename='js/popup.js') }}"></script>
+
+
+    <script>
+        checkMessages()
+        function openModal() {
+            const checkboxes = document.querySelectorAll('input[name="category_ids"]:checked');
+            if (checkboxes.length > 0) {
+                document.getElementById("confirmModal").style.display = "block";
+            } else {
+                alert("Please select at least one category to delete.");
+            }
+        }
+
+        function closeModal() {
+            document.getElementById("confirmModal").style.display = "none";
+        }
+
+        function submitForm() {
+            document.getElementById("categoryForm").submit();
+        }
+
+        // Search function to filter table by Category Type
+        function searchFunction() {
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("searchInput");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("categoryTable");
+            tr = table.getElementsByTagName("tr");
+
+            // Loop through all table rows, and hide those who don't match the search query
+            for (i = 1; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[2];  // Category Type is in the 3rd column (index 2)
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+
+        function showSuccessAlert() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('deleted') === 'true') {
+                Swal.fire({
+                    title: 'Categories deleted successfully!',
+                    icon: 'success',
+                    confirmButtonText: 'OK',
+                    width: '300px',
+                    customClass: {
+                        popup: 'small-swal-popup',
+                        title: 'small-swal-title',
+                        confirmButton: 'small-swal-button'
+                    }
+                });
+            }
+        }
+
+        window.onload = showSuccessAlert;
+    </script>
+</body>
+</html>

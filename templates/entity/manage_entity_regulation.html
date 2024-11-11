@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Entity</title>
+    <!-- Link to the global CSS file -->
+    <link rel="stylesheet" href="static/css/global.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pop-up.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Left side: Form -->
+        <div class="form-container">
+            <h1>Add Entity</h1>
+            <form  action="/manage_entity_submit_regulation" method="POST">
+
+
+
+                <div class="form-group">
+                    <label for="regulation-dropdown">Select Regulation:</label>
+                    <div class="select-container">
+                        <div class="dropdown">
+                            <button type="button" onclick="toggleDropdown()">Select Regulations</button>
+                            <div id="regulation-dropdown" class="dropdown-content">
+                                <div class="regulation-grid">
+                                    {% for regulation in regulations %}
+                                        <div class="regulation-item">
+                                            <input type="checkbox" name="regulation" value="{{ regulation }}" onchange="addToRegulations(this)">
+                                            <label>{{ regulation }}</label>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <textarea id="selected-regulations" name="selected_regulations" class="selected-regulations" readonly></textarea>
+                    </div>
+                </div>
+    
+
+
+                <!-- Buttons -->
+                <div class="buttons">
+                    <input type="submit" value="Submit">
+                    <input type="button" value="Back" onclick="window.history.back();">
+                </div>
+            </form>
+        </div>
+
+        <!-- Right side: Image -->
+        <div class="image-container">
+            <img src="static/images/bg_12.png" alt="Person filling form" class="form-filling-image2">
+        </div>
+    </div>
+
+    <!-- Hidden divs to store success and error messages -->
+    <div id="success-message" style="display:none;">
+        {% if success_message %}
+            {{ success_message }}
+        {% endif %}
+    </div>
+
+    <div id="error-message" style="display:none;">
+        {% if error_message %}
+            {{ error_message }}
+        {% endif %}
+    </div>
+
+    <!-- Popup overlay and content -->
+    <div class="overlay" id="overlay" style="display: none;"></div>
+    <div class="popup" id="popup" style="display: none;">
+        <div id="popup-icon"></div>
+        <h2 id="popup-title"></h2>
+        <p id="popup-message"></p>
+        <button onclick="closePopup()" id="popup-button">Continue</button>
+    </div>
+
+    <!-- Load the popup.js script -->
+    <script src="{{ url_for('static', filename='js/popup.js') }}"></script>
+
+    <script>
+        // <!-- Automatically check and display the pop-up if messages exist -->
+
+        checkMessages();
+ 
+
+
+    // Toggle dropdown visibility
+    function toggleDropdown() {
+                document.querySelector('.dropdown').classList.toggle('active');
+        }
+
+        // Add selected regulation to the textarea
+        function addToRegulations(element) {
+            const selectedTextBox = document.getElementById("selected-regulations");
+            const selectedValue = element.value;
+            
+            // Add regulation to the textarea if checked, remove if unchecked
+            if (element.checked) {
+                if (!selectedTextBox.value.includes(selectedValue)) {
+                    selectedTextBox.value += selectedValue + ', ';
+                }
+            } else {
+                // Remove regulation if unchecked
+                const currentValues = selectedTextBox.value.split(', ');
+                const newValues = currentValues.filter(item => item !== selectedValue);
+                selectedTextBox.value = newValues.join(', ');
+            }
+
+            // Adjust textarea height if content exceeds the height
+            if (selectedTextBox.scrollHeight > selectedTextBox.clientHeight) {
+                selectedTextBox.classList.add('expand');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Category</title>
+    <!-- Link to external CSS -->
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}"> -->
+    <!-- <link rel="stylesheet" href="static/css/Global/add_category.css"> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pop-up.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/Global/regulation.css') }}">
+
+    <style>
+        #remarks {
+            width: 100%; /* Adjust width */
+            height: 150px; /* Adjust height */
+            border-radius: 8px; /* Rounded corners */
+            padding: 10px;
+            /* border: 1px solid #ccc;  */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional shadow for better look */
+        }
+    
+        /* Add some border radius to input fields as well */
+        input[type="text"] {
+            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+    
+        /* Optional: Add some styling for buttons */
+        input[type="submit"], input[type="button"] {
+            border-radius: 8px;
+            padding: 10px 20px;
+            background-color: #1E90FF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    
+        input[type="submit"]:hover, input[type="button"]:hover {
+            background-color: #007ACC;
+        }
+    </style>
+    
+
+
+</head>
+<body>
+
+    <!-- Bubbles -->
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+
+
+    <div class="container">
+        <!-- Displaying Entity ID and User ID at the top of the form -->
+        
+
+        <div class="form-container">
+            <div class="form-header">
+                <div class="entity-id"><strong>Entity ID:</strong> {{ entity_id }}</div>
+                <div class="user-id"><strong>User ID:</strong> {{ user_id }}</div>
+            </div>
+            <h1>Add Category</h1>
+            <form action="/submit-category" method="POST">
+                <div class="form-group">
+                    <label for="categoryType">Category Name:</label>
+                    <input type="text" id="categoryType" name="categoryType" required>
+                </div>
+    
+                <div class="form-group">
+                    <label for="remarks">Category Description:</label>
+                    <textarea id="remarks" name="remarks" rows="4" required></textarea>
+                </div>
+    
+                <div class="buttons">
+                    <input type="submit" value="Submit">
+                    <input type="button" value="Back" onclick="window.location.href='/global_admin_dashboard';">
+                </div>                        
+            </form>
+        </div>
+        <div class="image-container">
+            <img src="static/images/bg_12.png" alt="Regulation Image" class="form-filling-image">
+        </div>
+
+
+    </div>
+    
+
+    <!-- Hidden divs to store success and error messages -->
+<!-- Hidden divs to store success and error messages -->
+<!-- Hidden divs for storing messages -->
+<div id="error-type" style="display:none;">
+    {% if error_type %}
+        {{ error_type }}
+    {% endif %}
+</div>
+<div id="remarks" style="display:none;">
+    {% if remarks %}
+        {{ remarks }}
+    {% endif %}
+</div>
+
+<!-- Popup overlay and content -->
+<div class="overlay" id="overlay" style="display: none;"></div>
+<div class="popup" id="popup" style="display: none;">
+    <div id="popup-icon"></div>
+    <h2 id="popup-title"></h2>
+    <p id="popup-message"></p>
+    <button onclick="closePopup()" id="popup-button">Continue</button>
+</div>
+
+<script>
+    alert
+    function showPopup(type, message) {
+        const popup = document.getElementById('popup');
+        const overlay = document.getElementById('overlay');
+        const popupIcon = document.getElementById('popup-icon');
+        const popupTitle = document.getElementById('popup-title');
+        const popupMessage = document.getElementById('popup-message');
+
+
+        popup.classList.remove('success', 'error', 'warning');
+        if (type === 's') {
+            popup.classList.add('success');
+            popupTitle.textContent = 'SUCCESS';
+            popupIcon.innerHTML = '✔';
+        } else if (type === 'e') {
+            popup.classList.add('error');
+            popupTitle.textContent = 'ERROR';
+            popupIcon.innerHTML = '❌';
+        } else if (type === 'w') {
+            popup.classList.add('warning');
+            popupTitle.textContent = 'WARNING';
+            popupIcon.innerHTML = '⚠';
+        }
+
+        popupMessage.textContent = message;
+        popup.style.display = 'block';
+        overlay.style.display = 'block';
+    }
+
+    function closePopup() {
+        document.getElementById('popup').style.display = 'none';
+        document.getElementById('overlay').style.display = 'none';
+    }
+
+    function checkMessages() {
+        const errorType = document.getElementById('error-type') ? document.getElementById('error-type').innerText.trim() : '';
+        const remarks = document.getElementById('remarks') ? document.getElementById('remarks').innerText.trim() : '';
+
+        if (errorType && remarks) {
+            showPopup(errorType, remarks);
+        }
+    }
+
+    window.onload = checkMessages;
+</script>
+</body>
+</html>

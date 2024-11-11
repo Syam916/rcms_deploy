@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regulation Checklist Form</title>
+    
+    <!-- Include jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    
+    <!-- Include Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    <!-- Include Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pop-up.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bubble.css') }}">
+
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(to right, #1E90FF, #87CEEB); /* Blue gradient */
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            padding-top: 20px;
+        }
+        .image-container {
+            max-width: 500px;
+            width: 130%;
+        }
+
+        .image-container img {
+            max-width: 130%;
+            border-radius: 15px;
+        }
+
+        .container {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    height: 80vh; /* Set a fixed height for the container */
+    /* margin-left: 20%; */
+}
+
+.form-content {
+    overflow-y: auto; /* Enable scrolling for the form content */
+    flex-grow: 1; /* Allow the form content to grow and take available space */
+    max-height: calc(80vh - 150px); /* Adjust height to ensure buttons are visible */
+}
+
+.buttons {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 15px;
+    padding-bottom: 10px;
+}
+
+        /* Display the entity_id and user_id */
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .form-header .entity-id,
+        .form-header .user-id {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .form-header strong {
+            font-weight: bold;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+            color: #4a4a4a;
+        }
+
+        label {
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        input[type="text"], input[type="number"], input[type="date"], select, textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .row .column {
+            width: 48%;
+        }
+
+
+        input[type="submit"], input[type="button"] {
+            padding: 12px;
+            border: none;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            background-color: #1E90FF;
+            width: 48%;
+        }
+
+        input[type="submit"]:hover, input[type="button"]:hover {
+            background-color: #007ACC;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-content h2 {
+            color: green;
+            margin-bottom: 10px;
+            font-size: 22px;
+        }
+
+        .modal-content p {
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .close-button {
+            padding: 10px 20px;
+            background-color: #1E90FF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .close-button:hover {
+            background-color: #4cae4c;
+        }
+         /* Style for readonly fields */
+         input[readonly], select[readonly] {
+            background-color: #f0f0f0; /* Light grey background */
+            color: #555; /* Slightly darker text color */
+            border: 1px solid #ccc; /* Add border to match other input fields */
+            cursor: not-allowed; /* Change cursor to indicate it's not editable */
+        }
+    </style>
+</head>
+<body>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="container">
+        <!-- Displaying Entity ID and User ID at the top of the form -->
+        <div class="form-header">
+            <div class="entity-id"><strong>Entity ID:</strong> {{ entity_id }}</div>
+            <div class="user-id"><strong>User ID:</strong> {{ user_id }}</div>
+        </div>
+
+        <h1>Add Activity</h1>
+        <form action="/submit_entity_checklist" method="POST">
+            <div class="form-content">
+                <label for="regulationName">Regulation Name:</label>
+                <select id="regulationName" name="regulationName" required onchange="fetchRegulationID();" class="searchable-select">
+                    <option value="">Select Regulation Name</option>
+                    {% for regulation in regulations %}
+                        <option value="{{ regulation[1] }}">{{ regulation[1] }}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="regulationID">Regulation ID:</label>
+                <input type="text" id="regulationID" name="regulationID" readonly>
+
+                <label for="activity">Activity:</label>
+                <input type="text" id="activity" name="activity" required>
+
+                <!-- Mandatory/Optional and Document Upload in one row -->
+                <div class="row">
+                    <div class="column">
+                        <label for="mandatoryOptional">Mandatory/Optional:</label>
+                        <select id="mandatoryOptional" name="mandatoryOptional" required>
+                            <option value="">Select Option</option>
+                            <option value="M">Mandatory</option>
+                            <option value="O">Optional</option>
+                        </select>
+                    </div>
+
+                    <div class="column">
+                        <label for="documentupload_yes_no">Document Upload (Yes/No):</label>
+                        <select id="documentupload_yes_no" name="documentupload_yes_no">
+                            <option value="">Select Option</option>
+                            <option value="Y">Yes</option>
+                            <option value="N">No</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Frequency and Frequency Timeline in one row -->
+                <div class="row">
+                    <div class="column">
+                        <label for="frequency">Frequency:</label>
+                        <select id="frequency" name="frequency" required>
+                            <option value="">Select Frequency</option>
+                            <option value="0">Only once</option>
+                            <option value="1">Annually</option>
+                            <option value="2">Half Yearly</option>
+                            <option value="3">Every 4 Months</option>
+                            <option value="6">Every 2 Months</option>
+                            <option value="4">Quarterly</option>
+                            <option value="12">Monthly</option>
+                            <option value="26">Fortnight</option>
+                            <option value="52">Weekly</option>
+                            <option value="365">Daily</option>
+                        </select>
+                    </div>
+
+                    <div class="column">
+                        <label for="frequencyTimeline">Frequency Timeline:</label>
+                        <input type="date" id="frequencyTimeline" name="frequencyTimeline" required>
+                    </div>
+                </div>
+
+                <!-- Criticality and Early Warning Days in one row -->
+                <div class="row">
+                    <div class="column">
+                        <label for="criticalNonCritical">Criticality:</label>
+                        <select id="criticalNonCritical" name="criticalNonCritical" required>
+                            <option value="">Select Option</option>
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
+                    </div>
+
+                    <div class="column">
+                        <label for="ews">Early Warning Days:</label>
+                        <input type="number" id="ews" name="ews" min="1" required>
+                    </div>
+                </div>
+
+                <label for="activityDescription">Activity Description:</label>
+                <textarea id="activityDescription" name="activityDescription" rows="4" required></textarea>
+            </div>
+
+            <!-- Fixed buttons at the bottom -->
+            <div class="buttons">
+                <input type="submit" value="Submit">
+                <input type="button" value="Back" onclick="window.location.href='/entity_admin_dashboard';" style="background-color: #5cb85c;">
+            </div>
+        </form>
+    </div>
+    <div class="image-container">
+        <img src="static/images/bg_12.png" alt="Person filling form" class="form-filling-image2">
+    </div>
+
+    <!-- Hidden divs to store success and error messages -->
+    <div id="success-message" style="display:none;">
+        {% if success_message %}
+            {{ success_message }}
+        {% endif %}
+    </div>
+
+    <div id="error-message" style="display:none;">
+        {% if error_message %}
+            {{ error_message }}
+        {% endif %}
+    </div>
+
+    <!-- Popup overlay and content -->
+    <div class="overlay" id="overlay" style="display: none;"></div>
+    <div class="popup" id="popup" style="display: none;">
+        <div id="popup-icon"></div>
+        <h2 id="popup-title"></h2>
+        <p id="popup-message"></p>
+        <button onclick="closePopup()" id="popup-button">Continue</button>
+    </div>
+
+    <!-- Load the popup.js script -->
+    <script src="{{ url_for('static', filename='js/popup.js') }}"></script>
+
+    <script>
+        checkMessages()
+
+        function fetchRegulationID() {
+            const regulationName = document.getElementById('regulationName').value;
+            const entityId = '{{ entity_id }}'; // Get the entity ID from the server-side template
+
+            if (regulationName) {
+                fetch(`/checklists/get_entity_regulation_id/${entityId}/${regulationName}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const regulationIDInput = document.getElementById('regulationID');
+                        regulationIDInput.value = data.regulation_id || '';
+                    })
+                    .catch(error => console.error('Error:', error));
+            } else {
+                console.error('Please select a regulation name.');
+            }
+        }
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            window.onclick = function(event) {
+                const modal = document.getElementById("messageModal");
+                if (event.target == modal) {
+                    closeModal();
+                }
+            }
+
+            // Apply Select2 to the regulationName select element
+            $(document).ready(function() {
+                $('#regulationName').select2({
+                    placeholder: 'Search for a regulation',
+                    allowClear: true
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,436 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: linear-gradient(to right, #1E90FF, #87CEEB); /* Blue gradient */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    position: relative; /* Necessary for the bubbles to be placed relative to the body */
+}
+
+/* Flexbox container for form and image */
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 90%; /* Adjust width based on your needs */
+    margin: 0 auto;
+}
+
+/* Form container styling */
+.form-container {
+    width: 75%; /* Adjust width to fit the left side */
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.8); /* Transparent background */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  
+}
+
+/* Form title styling */
+.form-container h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Form group styling */
+.form-group {
+    margin-bottom: 12px;
+    text-align: left;
+}
+
+.form-group label {
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+/* Row and column layout styling */
+/* Adjust the column and row for form layout */
+.row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.column {
+    width: 48%;
+}
+
+/* Ensure input fields have a consistent size */
+.column input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.column input, .column select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+/* Button styling */
+.buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.buttons input[type="submit"],
+.buttons input[type="button"] {
+    padding: 8px 12px;
+    border: none;
+    color: #fff;
+    background-color: #1E90FF;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.buttons input[type="submit"]:hover,
+.buttons input[type="button"]:hover {
+    background-color: #007ACC;
+}
+
+/* Image container styling */
+.image-container {
+    width: 65%; /* Adjust width to fit the right side */
+    text-align: center;
+    background-color: transparent;
+}
+
+/* Styling for the image itself */
+.form-filling-image {
+    max-width: 100%;
+    height: auto;
+    border: 2px solid rgba(255, 255, 255, 0.5); /* Add a light border to make the image stand out */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+/* Styling for the image itself */
+.form-filling-image2 {
+    max-width: 100%;
+    height: auto;
+    /* border: 2px solid rgba(255, 255, 255, 0.5); Add a light border to make the image stand out
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); */
+}
+/* Password input and eye icon styling */
+.password-container {
+    position: relative;
+    width: 100%;
+}
+
+.password-container input[type="password"],
+.password-container input[type="text"] {
+    width: 100%;
+    padding-right: 40px; /* Add space for the eye icon */
+    padding-left: 10px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 20px;
+    color: #888;
+}
+
+.toggle-password:hover {
+    color: #333;
+}
+
+
+/* Success Popup Styling */
+.popup {
+    display: none;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    text-align: center;
+    z-index: 1000;
+}
+
+.popup h2 {
+    color: green;
+}
+
+.popup button {
+    padding: 10px 20px;
+    background-color: #1E90FF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.popup button:hover {
+    background-color: #007ACC;
+}
+
+/* Overlay background when popup is active */
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+
+/* Style for the regulation dropdown and text box */
+.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.column {
+    flex: 1;
+    margin-right: 10px;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    padding: 8px 16px;
+    background-color: #1E90FF;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+button:hover {
+    background-color: #007ACC;
+}
+
+/* Container for button and text field side by side */
+.select-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+/* Styling for the dropdown button */
+.dropdown {
+    position: relative;
+    width: 200px; /* Adjust width as needed */
+}
+
+/* Adjust dropdown content width and remove horizontal scroll */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    bottom: 100%;
+    background-color: #f1f1f1;
+    width: 300px;  /* Adjust the width as needed */
+    max-height: 300px;
+    overflow-y: auto;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    padding: 10px;
+}
+
+/* Show dropdown when button is clicked */
+.dropdown.active .dropdown-content {
+    display: block;
+}
+
+/* Regulation grid to organize checkboxes */
+.regulation-grid {
+    display: block; /* Ensures checkboxes are in a single column */
+}
+
+/* Each regulation item in one line with checkbox and label */
+.regulation-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;  /* Minimal gap between checkbox and label */
+    white-space: nowrap;  /* Prevent label from wrapping to next line */
+}
+
+/* Ensure that the checkbox is aligned with the label */
+.regulation-item input[type="checkbox"] {
+    margin-right: 10px;  /* Adds space between checkbox and label */
+}
+
+/* Textbox for selected regulations */
+.selected-regulations {
+    flex: 1; /* Takes up remaining space */
+    padding: 5px;
+    height: 50px; /* Initial height */
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: none; /* Prevents resizing */
+}
+
+/* Button styling */
+button {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #1E90FF;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #007ACC;
+}
+
+
+/* Bubble effects */
+body::before {
+    content: '';
+    position: absolute;
+    top: -150px;
+    left: -150px;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(173, 216, 230, 0.3), rgba(173, 216, 230, 0)); /* Light Sky Blue bubbles */
+    border-radius: 50%;
+    animation: bubble 8s infinite ease-in-out;
+    z-index: 5; /* Ensure bubbles float over gradient but under the form */
+}
+
+body::after {
+    content: '';
+    position: absolute;
+    top: 200px;
+    right: -100px;
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, rgba(240, 248, 255, 0.3), rgba(240, 248, 255, 0)); /* Alice Blue bubbles */
+    border-radius: 50%;
+    animation: bubble 6s infinite ease-in-out;
+    z-index: 5; /* Ensure bubbles float over gradient but under the form */
+}
+
+/* Additional bubbles around the form */
+.bubble {
+    position: absolute;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0)); /* Pale white bubbles */
+    border-radius: 50%;
+    animation: bubble 10s infinite ease-in-out;
+    z-index: 5; /* Ensure bubbles float over gradient but under the form */
+}
+
+.bubble:nth-child(2) {
+    width: 100px;
+    height: 100px;
+    top: 100px;
+    left: 300px; /* Place near the top-left of the form */
+    animation-duration: 12s;
+}
+
+.bubble:nth-child(5) {
+    width: 150px;
+    height: 150px;
+    top: 150px;
+    right: 50px; /* Place near the right edge of the image */
+    animation-duration: 8s;
+}
+
+.bubble:nth-child(3) {
+    width: 80px;
+    height: 80px;
+    top: 150px;
+    left: 250px; /* Place closer to the form's left side */
+    animation-duration: 16s;
+}
+
+.bubble:nth-child(4) {
+    width: 120px;
+    height: 120px;
+    top: 100px;
+    left: 700px; /* Position on the bottom-right near the form */
+    animation-duration: 10s;
+}
+
+
+
+.bubble:nth-child(6) {
+    width: 70px;
+    height: 70px;
+    top: 500px;
+    left: 500px; /* Small bubble near the form's bottom */
+    animation-duration: 14s;
+}
+
+
+.bubble:nth-child(7) {
+    width: 180px;
+    height: 180px;
+    top: 450px;
+    left: 600px; /* Small bubble near the form's bottom */
+    animation-duration: 14s;
+}
+
+@keyframes bubble {
+    0% {
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-50px) scale(1.2);
+    }
+    100% {
+        transform: translateY(0) scale(1);
+    }
+}

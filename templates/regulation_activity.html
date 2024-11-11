@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regulation {{ regulation_id }} - Activities</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        /* Adjust column widths */
+        .dashboard-container {
+            background-color: #ffffff;
+            padding: 10px;  /* Reduced padding */
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 97%;  /* Reduced width */
+            max-width: 1480px;  /* Reduced max-width */
+            text-align: center;
+            overflow-y: auto;
+            height: 400vh;  /* Reduced max-height */
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .activity-column {
+            width: 10%;
+        }
+        .remarks-column {
+            width: 30%;
+        }
+        .activity-description-column {
+            width: 30%;
+        }
+        .upload-column {
+            width: 8%;
+        }
+        .status-column {
+            width: 7%;
+        }
+        .submit-column {
+            width: 5%;
+        }
+        textarea.remarks-input {
+            width: 100%;
+            height: 80px;
+            box-sizing: border-box;
+        }
+        .upload-input {
+            display: none;
+        }
+        .upload-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            font-size: 14px;
+        }
+        .upload-button:hover {
+            background-color: #45a049;
+        }
+        .custom-file-label {
+            font-size: 12px;
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        .user-id-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+        
+        .factory-id-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Regulation {{ regulation_id }} - Activities</h2>
+        <!--  -->
+ 
+        <table>
+            <thead>
+                <tr>
+                    <th>Activity ID</th>
+                    <th class="activity-column">Activity</th>
+                    <th class="activity-description-column">Activity Description</th>
+                    <th class="remarks-column">Remarks</th>
+                    <th class="upload-column">Upload</th>
+                    <th class="status-column">Status</th>
+                    <th class="submit-column">Submit</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for activity in activities %}
+                <tr>
+                    <form action="{{ url_for('submit_activity') }}" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="regulation_id" value="{{ regulation_id }}">
+                        <input type="hidden" name="activity_id" value="{{ activity[0] }}">
+                        <input type="hidden" name="due_on" value="{{ due_on }}">  
+                   
+                        <td>{{ activity[0] }}</td>
+                        <td class="activity-column">{{ activity[1] }}</td>
+                        <td class="activity-description-column">{{ activity[2] }}</td>
+                        <td class="remarks-column">
+                            <textarea class="remarks-input" name="remarks_{{ activity[0] }}" placeholder="Enter remarks">
+                                {% if activity[0] in responses %}
+                                    {{ responses[activity[0][2]] }}
+                                {% endif %}
+                            </textarea>
+                        </td>
+                        <td class="upload-column">
+                            <label class="upload-button" for="file_{{ activity[0] }}">Upload</label>
+                            <input type="file" id="file_{{ activity[0] }}" name="file_{{ activity[0] }}" class="upload-input">
+                            <span class="custom-file-label" id="file-label-{{ activity[0] }}">No file chosen</span>
+                        </td>
+                        <td class="status-column">
+                            <select name="status_{{ activity[0] }}">
+                                <option value="Yet to start" {% if activity[0] not in responses %}selected{% endif %}>Yet to start</option>
+                                <option value="WIP" {% if activity[0] in responses and responses[activity[0]].status == 'WIP' %}selected{% endif %}>WIP</option>
+                                <option value="Completed" {% if activity[0] in responses and responses[activity[0]].status == 'Completed' %}selected{% endif %}>Completed</option>
+                            </select>
+                        </td>
+                        <td class="submit-column">
+                            <button type="submit" class="small-button">Submit</button>
+                        </td>
+                    </form>                    
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script>
+        // Add event listeners to update the file label when a file is chosen
+        document.querySelectorAll('.upload-input').forEach(input => {
+            input.addEventListener('change', function() {
+                const fileLabel = document.querySelector(`#file-label-${this.id.split('_')[1]}`);
+                fileLabel.textContent = this.files[0] ? this.files[0].name : 'No file chosen';
+            });
+        });
+    </script>
+</body>
+</html>

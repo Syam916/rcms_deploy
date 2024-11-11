@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Details</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user/activity_details.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pop-up.css') }}"> <!-- Link to the pop-up CSS -->
+    <style>
+        .mandatory {
+            color: red;
+            font-weight: bold;
+        }
+        .back-button {
+            margin-top: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            float: right; /* Align to the right */
+        }
+        .back-button:hover {
+            background-color: #45a049;
+        }
+        .info-section {
+            background-color: #f0f8ff; /* Light background color to differentiate */
+            padding: 15px; /* Add padding for better spacing */
+            border-radius: 5px; /* Optional: Add border radius for rounded corners */
+            margin-bottom: 20px; /* Space below the info section */
+        }
+        /* Dropdown and link input styles */
+        select {
+            padding: 1px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 5px;
+            width: 100%; /* Full width */
+            box-sizing: border-box; /* Includes padding and border in the element's total width */
+            font-size: 12px; /* Increase font size */
+        }
+        select:focus {
+            border-color: #4CAF50; /* Green border on focus */
+            outline: none; /* Remove outline */
+        }
+        /* Modal styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black background with opacity */
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover, .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .submit-button, .modal-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .submit-button:hover, .modal-button:hover {
+            background-color: #218838;
+        }
+        /* Hyperlink */
+        .uploaded-link {
+            color: #007bff;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        /* Additional styles for the review box */
+        .review-box {
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+        .review-box h2 {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Display user_id, entity_id, and due_on with a background color -->
+        <div class="info-section">
+            <p><strong>User ID:</strong> {{ user_id }}</p>
+            <p><strong>Entity ID:</strong> {{ entity_id }}</p>
+            <p><strong>Due On:</strong> {{ due_on }}</p>
+        </div>
+       
+        <!-- Update the heading to display regulation_name -->
+        <h1 class="heading">Regulation: {{ activity.regulation_name }}</h1>
+ 
+        <!-- Box to display remarks and document link for review role -->
+        {% if role == 'review' %}
+        <div class="review-box" id="reviewBox">
+            <h2>Task Details from Preparation</h2>
+            <p><strong>Remarks:</strong> <span id="remarksText">Loading...</span></p>
+            <p><strong>Document Link:</strong> <span id="documentLinkText">Loading...</span></p>
+        </div>
+        {% endif %}
+ 
+        <form id="activity-form" method="POST">
+            <input type="hidden" name="activity_id" value="{{ activity.activity_id }}">
+            <input type="hidden" name="role" value="{{ role }}">
+            <input type="hidden" name="regulation_id" value="{{ regulation_id }}">
+            <input type="hidden" name="user_id" value="{{ user_id }}">
+            <input type="hidden" name="entity_id" value="{{ entity_id }}">
+            <input type="hidden" name="due_on" value="{{ due_on }}">
+            <!-- Hidden input field to store the document link -->
+            <input type="hidden" name="document_link" id="documentLinkHidden" value="">
+ 
+            <table>
+                <thead>
+                    <tr>
+                        <th>Activity ID</th>
+                        <th>Activity</th>
+                        <th>Description</th>
+                        {% if role == 'preparation' %}
+                            <th>Remarks</th>
+                            <th>Status</th>
+                            <th>Document Link</th>
+                        {% elif role == 'review' %}
+                            <th>Review Comments</th>
+                            <th>Document Link</th>
+                        {% endif %}
+                        <th>Submit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ activity.activity_id }}</td>
+                        <td>
+                            {{ activity.activity }}
+                            {% if 'M' in activity.mandatory_optional %}
+                                <span class="mandatory">*</span>
+                            {% endif %}
+                        </td>                        
+                        <td>{{ activity.activity_description }}</td>
+ 
+                        {% if role == 'preparation' %}
+                            <td><textarea name="remarks">{{ remarks }}</textarea></td>
+                            <td>
+                                <select name="status">
+                                    <option value="Yet to Start" {% if status == 'Yet to Start' %}selected{% endif %}>Yet to Start</option>
+                                    <option value="WIP" {% if status == 'WIP' %}selected{% endif %}>WIP</option>
+                                    <option value="Completed" {% if status == 'Completed' %}selected{% endif %}>Completed</option>
+                                </select>
+                            </td>
+                            <td>
+                                <button type="button" class="modal-button" id="uploadLinkButton">Upload Link</button>
+                                {% if document_upload_required %}
+                                    <span style="color:red;">*</span>
+                                {% endif %}
+                                <p id="uploadedLinkText"></p>
+                            </td>
+                        {% elif role == 'review' %}
+                            <td><textarea name="review_comments">{{ review_comments or '' }}</textarea></td>
+                            <td>
+                                <button type="button" class="modal-button" id="uploadLinkButton">Upload Link</button>
+                                {% if document_upload_required %}
+                                    <span style="color:red;">*</span>
+                                {% endif %}
+                                <p id="uploadedLinkText"></p>
+                            </td>
+                        {% endif %}
+                        <td><button type="submit" class="submit-button">Submit</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+ 
+        <!-- Back Button -->
+        <button class="back-button" onclick="goBack()">Back</button>
+    </div>
+ 
+    <!-- The Modal -->
+    <div id="linkModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Paste Document Link</h2>
+            <input type="text" id="documentLinkInput" placeholder="Paste link here" style="width: 100%; padding: 10px;">
+            <button type="button" class="modal-button" id="saveLinkButton">Upload</button>
+        </div>
+    </div>
+ 
+    <!-- Popup overlay and content -->
+    <div class="overlay" id="overlay" style="display: none;"></div>
+    <div class="popup" id="popup" style="display: none;">
+        <div id="popup-icon"></div>
+        <h2 id="popup-title"></h2>
+        <p id="popup-message"></p>
+        <button onclick="closePopup()" id="popup-button">Continue</button>
+    </div>
+ 
+<script src="{{ url_for('static', filename='js/popup.js') }}"></script> <!-- Link to your existing popup.js script -->
+ 
+<script>
+    // Back button functionality to return to the previous page
+    function goBack() {
+        window.location.href = "{{ url_for('entity_user') }}";
+    }
+ 
+    // Modal functionality
+    const modal = document.getElementById('linkModal');
+    const btn = document.getElementById('uploadLinkButton');
+    const span = document.getElementsByClassName('close')[0];
+    const saveLinkButton = document.getElementById('saveLinkButton');
+    const uploadedLinkText = document.getElementById('uploadedLinkText');
+    const hiddenLinkInput = document.getElementById('documentLinkHidden');
+ 
+    // Open the modal
+    btn.onclick = function() {
+        modal.style.display = "block";
+    }
+ 
+    // Close the modal when the "x" is clicked
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+ 
+    // Close the modal when clicking outside of the modal
+    window.onclick = function(event) {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    }
+ 
+    // Save the document link, update the hidden input, and close the modal
+    saveLinkButton.onclick = function() {
+        const documentLink = document.getElementById('documentLinkInput').value;
+        if (documentLink) {
+            uploadedLinkText.innerHTML = `<a href="${documentLink}" target="_blank" class="uploaded-link">View Document</a>`;
+            hiddenLinkInput.value = documentLink;
+            modal.style.display = "none";
+        }
+    }
+ 
+    // Assign template variables to JavaScript variables
+    const role = "{{ role }}";
+    const activityId = "{{ activity.activity_id }}";
+    const regulationId = "{{ regulation_id }}";
+    const dueOn = "{{ due_on }}";
+ 
+    // Fetch preparation data for review role
+    if (role === 'review') {
+        fetch(`/get_task_details_user?activity_id=${activityId}&regulation_id=${regulationId}&due_on=${dueOn}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById("remarksText").textContent = data.remarks || "No remarks available";
+                    document.getElementById("documentLinkText").innerHTML = data.upload_link
+                        ? `<a href="${data.upload_link}" target="_blank">View Document</a>`
+                        : "No document link available";
+                } else {
+                    document.getElementById("remarksText").textContent = "Failed to fetch data.";
+                    document.getElementById("documentLinkText").textContent = "";
+                }
+            })
+            .catch(error => console.error("Error fetching task details:", error));
+    }
+</script>
+ 
+</body>
+</html>

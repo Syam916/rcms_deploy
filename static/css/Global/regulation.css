@@ -1,0 +1,211 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: linear-gradient(to right, #1E90FF, #87CEEB); /* Blue gradient */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    position: relative; /* Necessary for the bubbles to be placed relative to the body */
+}
+
+.container {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 100vh;
+}
+
+.form-container {
+    background-color: rgba(255, 255, 255, 0.8); /* Slightly transparent white */
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* Softer shadow */
+    text-align: center;
+    max-width: 500px;
+    width: 100%;
+    z-index: 10; /* Ensure form stays above bubbles */
+    margin-left: 17%;
+}
+
+/* Form title */
+h1 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+}
+
+/* Input fields and dropdown styles */
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #333;
+}
+
+input[type="text"],
+input[type="date"],
+select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: rgba(240, 248, 255, 0.8); /* Very light blue for input fields */
+    color: #333; /* Ensure text is still readable */
+}
+
+/* Input rows with two columns */
+.row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.column {
+    width: 48%;
+}
+
+/* Button styles */
+input[type="submit"],
+input[type="button"] {
+    background-color: #1E90FF; /* Dodger Blue for buttons */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 48%;
+    font-size: 16px;
+    margin: 0 5px;
+}
+
+input[type="submit"]:hover,
+input[type="button"]:hover {
+    background-color: #007ACC; /* Slightly darker blue for hover effect */
+}
+
+/* Adjust button alignment */
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.image-container {
+    max-width: 500px;
+    width: 130%;
+    margin-right: 15%;
+}
+
+.image-container img {
+    max-width: 130%;
+    border-radius: 15px;
+}
+
+/* Bubble effects */
+body::before {
+    content: '';
+    position: absolute;
+    top: -150px;
+    left: -150px;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(173, 216, 230, 0.3), rgba(173, 216, 230, 0)); /* Light Sky Blue bubbles */
+    border-radius: 50%;
+    animation: bubble 8s infinite ease-in-out;
+    z-index: 5; /* Ensure bubbles float over gradient but under the form */
+}
+
+body::after {
+    content: '';
+    position: absolute;
+    top: 200px;
+    right: -100px;
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, rgba(240, 248, 255, 0.3), rgba(240, 248, 255, 0)); /* Alice Blue bubbles */
+    border-radius: 50%;
+    animation: bubble 6s infinite ease-in-out;
+    z-index: 5; /* Ensure bubbles float over gradient but under the form */
+}
+
+/* Additional bubbles around the form */
+.bubble {
+    position: absolute;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0)); /* Pale white bubbles */
+    border-radius: 50%;
+    animation: bubble 10s infinite ease-in-out;
+    z-index: 5; /* Ensure bubbles float over gradient but under the form */
+}
+
+.bubble:nth-child(2) {
+    width: 100px;
+    height: 100px;
+    top: 100px;
+    left: 300px; /* Place near the top-left of the form */
+    animation-duration: 12s;
+}
+
+.bubble:nth-child(5) {
+    width: 150px;
+    height: 150px;
+    top: 150px;
+    right: 50px; /* Place near the right edge of the image */
+    animation-duration: 8s;
+}
+
+.bubble:nth-child(3) {
+    width: 80px;
+    height: 80px;
+    top: 250px;
+    left: 250px; /* Place closer to the form's left side */
+    animation-duration: 16s;
+}
+
+.bubble:nth-child(4) {
+    width: 120px;
+    height: 120px;
+    top: 400px;
+    left: 700px; /* Position on the bottom-right near the form */
+    animation-duration: 10s;
+}
+
+
+
+.bubble:nth-child(6) {
+    width: 70px;
+    height: 70px;
+    top: 500px;
+    left: 500px; /* Small bubble near the form's bottom */
+    animation-duration: 14s;
+}
+
+
+.bubble:nth-child(7) {
+    width: 180px;
+    height: 180px;
+    top: 450px;
+    left: 50px; /* Small bubble near the form's bottom */
+    animation-duration: 14s;
+}
+
+@keyframes bubble {
+    0% {
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-50px) scale(1.2);
+    }
+    100% {
+        transform: translateY(0) scale(1);
+    }
+}

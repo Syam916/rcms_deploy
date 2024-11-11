@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Assignment</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pop-up.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bubble.css') }}">
+
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(to right, #1E90FF, #87CEEB); /* Blue gradient */
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            padding-top: 20px;
+        }
+        .image-container {
+            max-width: 500px;
+            width: 130%;
+        }
+
+        .image-container img {
+            max-width: 130%;
+            border-radius: 15px;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: left;
+            overflow: auto;
+            height: 80vh;
+        }
+
+        .form-content {
+    overflow-y: auto; /* Enable vertical scrolling */
+    flex-grow: 1; /* Allow the form content to grow and take available space */
+    max-height: calc(80vh - 150px); /* Adjust height to ensure buttons are visible */
+}
+        /* Display the entity_id and user_id */
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .form-header .entity-id,
+        .form-header .user-id {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .form-header strong {
+            font-weight: bold; /* Making the labels bold */
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+            color: #4a4a4a;
+        }
+        label {
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            gap: 10px;
+        }
+        .column {
+            width: 48%;
+        }
+        .column label, .column input[type="text"], .column select {
+            width: 100%;
+            display: block;
+        }
+        input[type="text"], select {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        /* New button styles */
+        .button {
+            width: calc(50% - 10px); /* Adjusts for the gap between buttons */
+            padding: 12px;
+            border: none;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px; /* Aligns the top margin with the submit button */
+        }
+        .button-green {
+            background-color: #5cb85c;
+        }
+        .button-green:hover {
+            background-color: #4cae4c;
+        }
+        .button-orange {
+            background-color: #f0ad4e;
+        }
+        .button-orange:hover {
+            background-color: #ec971f;
+        }
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        /* Style for readonly fields */
+        input[readonly], select[readonly] {
+            background-color: #f0f0f0; /* Light grey background */
+            color: #555; /* Slightly darker text color */
+            border: 1px solid #ccc; /* Add border to match other input fields */
+            cursor: not-allowed; /* Change cursor to indicate it's not editable */
+        }
+
+    </style>
+   
+</head>
+<body>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="container">
+        <!-- Displaying Entity ID and User ID at the top of the form -->
+        <div class="form-header">
+            <div class="entity-id"><strong>Entity ID:</strong> {{ task_entity_id }}</div>
+            <div class="user-id"><strong>User ID:</strong> {{ user_id }}</div>
+        </div>
+        <h1>Task Assignment</h1>
+        <form action="/submit-form" method="POST">
+ 
+            <label for="regulationID">Regulation ID:</label>
+            <select id="regulationID" name="regulationID" onchange="fetchRegulationNameAndCategory(); fetchActivities();" required>
+                <option value="">Select a Regulation</option>
+            </select>
+ 
+            <label for="regulationName">Regulation Name:</label>
+            <input type="text" id="regulationName" name="regulationName" readonly required>
+ 
+            <label for="categoryType">Category Type:</label>
+            <input type="text" id="categoryType" name="categoryType" readonly required>
+ 
+            <label for="taskName">Task Name:</label>
+            <select id="taskName" name="taskName" onchange="updateCriticalityAndFrequency()" required></select>
+ 
+            <div class="row">
+                <div class="column">
+                    <label for="criticality">Criticality:</label>
+                    <input type="text" id="criticality" name="criticality" readonly required>
+                </div>
+                         
+                <div class="column">
+                    <label for="ews">Early Warning Days:</label>
+                    <input type="text" id="ews" name="ews" min="1" readonly required>
+                </div>
+            </div>
+ 
+            <div class="row">
+                <div class="column">
+                    <label for="frequency">Frequency:</label>
+                    <input type="text" id="frequencyInput" name="frequency" readonly required>
+ 
+                </div>
+                <div class="column">
+                    <label for="dueOn">Next Due On:</label>
+                    <input type="text" id="dueOn" name="Due_on" readonly required>
+                </div>
+            </div>
+ 
+            <label for="assignTo">Assign To:</label>
+            <select id="assignTo" name="Assign_to" required>
+                <option value="">Select a User</option>
+            </select>
+ 
+            <label for="reviewer">Reviewer:</label>
+            <select id="reviewer" name="Reviewer" required>
+                <option value="">Select a User</option>
+            </select>
+ 
+            <div class="row" style="margin-top: 20px;"> <!-- Ensures spacing from above elements -->
+                <input type="submit" value="Submit" class="button button-green">
+                <!-- Direct Link Back Button -->
+                <button type="button"  onclick="window.location.href='/entity_admin_dashboard';" class="button button-green">Back</button>
+            </div>
+           
+        </form>
+
+
+    </div>
+
+    <div class="image-container">
+        <img src="{{ url_for('static', filename='images/bg_12.png') }}"alt="Person filling form" class="form-filling-image2">
+    </div>
+    
+
+
+    <!-- Hidden divs to store success and error messages -->
+    <div id="success-message" style="display:none;">
+        {% if success_message %}
+            {{ success_message }}
+        {% endif %}
+    </div>
+
+    <div id="error-message" style="display:none;">
+        {% if error_message %}
+            {{ error_message }}
+        {% endif %}
+    </div>
+
+    <!-- Popup overlay and content -->
+    <div class="overlay" id="overlay" style="display: none;"></div>
+    <div class="popup" id="popup" style="display: none;">
+        <div id="popup-icon"></div>
+        <h2 id="popup-title"></h2>
+        <p id="popup-message"></p>
+        <button onclick="closePopup()" id="popup-button">Continue</button>
+    </div>
+
+    <!-- Load the popup.js script -->
+    <script src="{{ url_for('static', filename='js/popup.js') }}"></script>
+ 
+
+ 
+    <script>
+
+        checkMessages()
+        // Fetch regulations based on task_entity_id from the session
+        function fetchRegulations() {
+            const taskEntityId = "{{ task_entity_id }}";
+            if (taskEntityId) {
+                fetch(`/admin/assign_task/get-regulations/${encodeURIComponent(taskEntityId)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const regulationSelect = document.getElementById('regulationID');
+                        regulationSelect.innerHTML = '<option value="">Select a Regulation</option>';
+                        data.forEach(regulationId => {
+                            const option = new Option(regulationId, regulationId);
+                            regulationSelect.add(option);
+                        });
+                    })
+                    .catch(error => showModal('Failed to load regulations.'));
+            } else {
+                showModal('Failed to load task entity from session.');
+            }
+        }
+        function fetchRegulationNameAndCategory() {
+            const regulationId = document.getElementById('regulationID').value;
+ 
+            if (regulationId) {
+                fetch(`/admin/assign_task/get-regulation-name/${regulationId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const regulationNameInput = document.getElementById('regulationName');
+                        regulationNameInput.value = data.regulation_name || '';
+ 
+                        fetch(`/admin/assign_task/get-category-type/${regulationId}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                const categoryTypeInput = document.getElementById('categoryType');
+                                categoryTypeInput.value = data.category_type || '';
+                            })
+                            .catch(error => showModal('Failed to load category type.'));
+                    })
+                    .catch(error => showModal('Failed to load regulation name.'));
+            } else {
+                showModal('Please select a regulation.');
+            }
+        }
+ 
+        function fetchActivities() {
+            const regulationId = document.getElementById('regulationID').value;
+
+            if (regulationId) {
+                fetch(`/admin/assign_task/get-activities/${regulationId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const activitiesSelect = document.getElementById('taskName');
+                        activitiesSelect.innerHTML = '<option value="">Select a Task</option>';
+                        data.forEach(activity => {
+                            const option = new Option(activity.activity, activity.activity_id);
+                            option.dataset.criticality = activity.criticality;
+                            option.dataset.ews = activity.ews;
+                            option.dataset.frequency = activity.frequency; // Store frequency value
+                            activitiesSelect.add(option);
+                        });
+                    })
+                    .catch(error => showModal('Failed to load activities.'));
+            } else {
+                showModal('Please select a regulation.');
+            }
+        }
+
+        function updateCriticalityAndFrequency() {
+            const activitiesSelect = document.getElementById('taskName');
+            const selectedOption = activitiesSelect.options[activitiesSelect.selectedIndex];
+            const criticalityInput = document.getElementById('criticality');
+            const ewsInput = document.getElementById('ews');
+            const frequencyInput = document.getElementById('frequencyInput'); // Read-only frequency input
+            const regulationId = document.getElementById('regulationID').value;
+
+            if (selectedOption) {
+                criticalityInput.value = selectedOption.dataset.criticality || '';
+                ewsInput.value = selectedOption.dataset.ews || '';
+                const activityId = selectedOption.value;
+
+                fetch(`/admin/assign_task/get-frequency/${regulationId}/${activityId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const frequencyValue = data.frequency;
+                        if (frequencyValue !== null) {
+                            frequencyInput.value = getFrequencyText(frequencyValue);
+                        } else {
+                            frequencyInput.value = 'Unknown';
+                        }
+
+                        // Fetch Due On date
+                        fetch(`/admin/assign_task/get-due-on/${regulationId}/${activityId}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                const dueOnInput = document.getElementById('dueOn');
+                                dueOnInput.value = data.due_on || 'Not available';
+                            })
+                            .catch(error => showModal('Failed to load due date.'));
+                    })
+                    .catch(error => showModal('Failed to load frequency.'));
+            } else {
+                showModal('Please select a task.');
+            }
+        }
+
+        // Function to map frequency values to text
+        function getFrequencyText(frequency) {
+            switch(parseInt(frequency)) {
+                case 0: return 'Only once';
+                case 1: return 'Annually';
+                case 2: return 'Semi-Annually';
+                case 3: return 'Every 4 Months';
+                case 4: return 'Quarterly';
+                case 6: return 'Every 2 Months';
+                case 12: return 'Monthly';
+                case 26: return 'Fortnight';
+                case 52: return 'Weekly';
+                case 365: return 'Daily';
+                default: return 'Unknown';
+            }
+        }
+        function fetchUsers() {
+            const taskEntityId = "{{ task_entity_id }}";  // Ensure this is correctly passed from the session
+            if (taskEntityId) {
+                fetch(`/admin/assign_task/get-users/${encodeURIComponent(taskEntityId)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const assignToSelect = document.getElementById('assignTo');
+                        const reviewerSelect = document.getElementById('reviewer');
+
+                        // Clear previous options
+                        assignToSelect.innerHTML = '<option value="">Select a User</option>';
+                        reviewerSelect.innerHTML = '<option value="">Select a User</option>';
+
+                        // Populate dropdowns
+                        data.forEach(user => {
+                            const option1 = new Option(user.user_name, user.user_id);
+                            const option2 = new Option(user.user_name, user.user_id);
+                            assignToSelect.add(option1);
+                            reviewerSelect.add(option2);
+                        });
+                    })
+                    .catch(error => showModal('Failed to load users.'));
+            } else {
+                showModal('Failed to load task entity from session.');
+            }
+        }
+
+ 
+        function showModal(message) {
+            document.getElementById('modalMessage').textContent = message;
+            const modal = document.getElementById("messageModal");
+            modal.style.display = "block";
+ 
+            const span = document.getElementsByClassName("close")[0];
+            span.onclick = function() {
+                modal.style.display = "none";
+            }
+ 
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+        }
+ 
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchRegulations();  // Automatically load regulations when the page loads
+            fetchUsers();  // Automatically load users when the page loads
+            const errorMessage = "{{ error_message | default('') | e }}";
+            const successMessage = "{{ success_message | default('') | e }}";
+ 
+            if (errorMessage && errorMessage !== "None") {
+                showModal(errorMessage);
+            } else if (successMessage && successMessage !== "None") {
+                showModal(successMessage);
+            }
+        });
+    </script>
+</body>
+</html>

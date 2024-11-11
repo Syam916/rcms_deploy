@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Assignment</title>
+    <style>
+        /* Existing styles */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #71b7e6, #9b59b6);
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            padding-top: 20px;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: left;
+            overflow: auto;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+            color: #4a4a4a;
+        }
+        label {
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            gap: 10px;
+        }
+        .column {
+            width: 48%;
+        }
+        .column label, .column input[type="text"], .column select {
+            width: 100%;
+            display: block;
+        }
+        input[type="text"], select {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        /* New button styles */
+        .button {
+            width: calc(50% - 10px); /* Adjusts for the gap between buttons */
+            padding: 12px;
+            border: none;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px; /* Aligns the top margin with the submit button */
+        }
+        .button-green {
+            background-color: #5cb85c;
+        }
+        .button-green:hover {
+            background-color: #4cae4c;
+        }
+        .button-orange {
+            background-color: #f0ad4e;
+        }
+        .button-orange:hover {
+            background-color: #ec971f;
+        }
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Task Assignment</h1>
+        <form action="/submit-form" method="POST">
+            <label for="factoryID">Factory ID:</label>
+            <select id="factoryID" name="factoryID" onchange="fetchRegulations(); fetchUsers();">
+                <option value="">Select a Factory</option>
+                {% for id in factory_ids %}
+                    <option value="{{ id[0] }}">{{ id[0] }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="regulationID">Regulation ID:</label>
+            <select id="regulationID" name="regulationID" onchange="fetchRegulationNameAndCategory(); fetchActivities();">
+                <option value="">Select a Regulation</option>
+            </select>
+
+            <label for="regulationName">Regulation Name:</label>
+            <input type="text" id="regulationName" name="regulationName" readonly>
+
+            <label for="categoryType">Category Type:</label>
+            <input type="text" id="categoryType" name="categoryType">
+
+            <label for="taskName">Task Name:</label>
+            <select id="taskName" name="taskName" onchange="updateCriticalityAndFrequency()"></select>
+
+            <div class="row">
+                <div class="column">
+                    <label for="criticality">Criticality:</label>
+                    <input type="text" id="criticality" name="criticality" readonly>
+                </div>
+
+                <div class="column">
+                    <label for="ews">Early Warning Days:</label>
+                    <input type="text" id="ews" name="ews">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="column">
+                    <label for="frequency">Frequency:</label>
+                    <select id="frequencyDropdown" name="frequency" onchange="updateFrequencyInput()">
+                        <option value="0">Only once</option>
+                        <option value="1">Annually</option>
+                        <option value="2">Semi-Annually</option>
+                        <option value="3">Every 4 Months</option>
+                        <option value="4">Quarterly</option>
+                        <option value="6">Every 2 months</option>
+                        <option value="12">Monthly</option>
+                        <option value="26">Fortnight</option>
+                        <option value="52">Weekly</option>
+                        <option value="365">Daily</option>
+                    </select>
+                </div>
+
+                <!-- Replace input for dueOn with a dropdown -->
+                <div class="column">
+                    <label for="dueOn">Next Due On:</label>
+                    <select id="dueOn" name="Due_on">
+                        <option value="">Select a Due Date</option>
+                    </select>
+                </div>
+            </div>
+
+            <label for="assignTo">Assign To:</label>
+            <select id="assignTo" name="Assign_to">
+                <option value="">Select a User</option>
+            </select>
+
+            <label for="reviewer">Reviewer:</label>
+            <select id="reviewer" name="Reviewer">
+                <option value="">Select a User</option>
+            </select>
+
+            <div class="row" style="margin-top: 20px;"> <!-- Ensures spacing from above elements -->
+                <input type="submit" value="Submit" class="button button-green">
+                <!-- Direct Link Back Button -->
+                <button type="button" onclick="window.history.back();" class="button button-green">Back</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p id="modalMessage">Some message...</p>
+        </div>
+    </div>
+
+    <script>
+        function fetchRegulations() {
+            const factoryId = document.getElementById('factoryID').value;
+           
+            if (factoryId) {
+                fetch(`/admin/assign_task/get-regulations/${encodeURIComponent(factoryId)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const regulationSelect = document.getElementById('regulationID');
+                        regulationSelect.innerHTML = '<option value="">Select a Regulation</option>';
+                        data.forEach(regulationId => {
+                            const option = new Option(regulationId, regulationId);
+                            regulationSelect.add(option);
+                        });
+                    })
+                    .catch(error => showModal('Failed to load regulations.'));
+            } else {
+                showModal('Please select a factory.');
+            }
+        }
+ 
+        function fetchRegulationNameAndCategory() {
+            const regulationId = document.getElementById('regulationID').value;
+ 
+            if (regulationId) {
+                fetch(`/admin/assign_task/get-regulation-name/${regulationId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const regulationNameInput = document.getElementById('regulationName');
+                        regulationNameInput.value = data.regulation_name || '';
+ 
+                        fetch(`/admin/assign_task/get-category-type/${regulationId}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                const categoryTypeInput = document.getElementById('categoryType');
+                                categoryTypeInput.value = data.category_type || '';
+                            })
+                            .catch(error => showModal('Failed to load category type.'));
+                    })
+                    .catch(error => showModal('Failed to load regulation name.'));
+            } else {
+                showModal('Please select a regulation.');
+            }
+        }
+ 
+        function fetchActivities() {
+            const regulationId = document.getElementById('regulationID').value;
+ 
+            if (regulationId) {
+                fetch(`/admin/assign_task/get-activities/${regulationId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const activitiesSelect = document.getElementById('taskName');
+                        activitiesSelect.innerHTML = '<option value="">Select a Task</option>';
+                        data.forEach(activity => {
+                            const option = new Option(activity.activity, activity.activity_id);
+                            option.dataset.critical_noncritical = activity.critical_noncritical;
+                            option.dataset.ews = activity.ews;
+                            activitiesSelect.add(option);
+                        });
+                    })
+                    .catch(error => showModal('Failed to load activities.'));
+            } else {
+                showModal('Please select a regulation.');
+            }
+        }
+ 
+        function updateCriticalityAndFrequency() {
+            const activitiesSelect = document.getElementById('taskName');
+            const selectedOption = activitiesSelect.options[activitiesSelect.selectedIndex];
+            const criticalityInput = document.getElementById('criticality');
+            const ewsInput = document.getElementById('ews');
+            const frequencyDropdown = document.getElementById('frequencyDropdown');
+            const regulationId = document.getElementById('regulationID').value;
+
+            if (selectedOption) {
+                criticalityInput.value = selectedOption.dataset.critical_noncritical || '';
+                ewsInput.value = selectedOption.dataset.ews || '';
+                const activityId = selectedOption.value;
+
+                fetch(`/admin/assign_task/get-frequency/${regulationId}/${activityId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Frequency data:', data);  // Add this line
+                        const frequency = data.frequency;
+                        if (frequency !== null) {
+                            frequencyDropdown.value = frequency;
+                        } else {
+                            console.warn('No frequency data found');  // Add this line
+                        }
+
+                        fetch(`/admin/assign_task/get-due-on/${regulationId}/${activityId}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log('Due On data:', data);  // Add this line
+                                const dueOnDropdown = document.getElementById('dueOn');
+                                dueOnDropdown.innerHTML = '';  // Clear existing options
+                                
+                                if (data.due_on && data.due_on.length > 0) {
+                                    data.due_on.forEach((dueDate, index) => {
+                                        const option = new Option(dueDate, dueDate);
+                                        dueOnDropdown.add(option);
+                                        if (index === 0) {
+                                            option.selected = true;  // Default to first due date
+                                        }
+                                    });
+                                } else {
+                                    const option = new Option('Not available', '');
+                                    dueOnDropdown.add(option);
+                                }
+                            })
+                            .catch(error => showModal('Failed to load due date.'));
+                    })
+                    .catch(error => showModal('Failed to load frequency.'));
+            } else {
+                showModal('Please select a task.');
+            }
+        }
+ 
+ 
+        function updateFrequencyInput() {
+            const frequencyDropdown = document.getElementById('frequencyDropdown');
+            const frequencyInput = document.getElementById('frequencyInput');
+           
+            // Update the readonly input field when the dropdown changes
+            frequencyInput.value = getFrequencyText(frequencyDropdown.value);
+        }
+ 
+        function getFrequencyText(frequency) {
+            switch(parseInt(frequency)) {
+                case 0: return 'Only once';
+                case 1: return 'Annually';
+                case 2: return 'Half Yearly';
+                case 3: return 'Every 4 Months';
+                case 4: return 'Quarterly';
+                case 6: return 'Every 2 Months';
+                case 12: return 'Monthly';
+                case 26: return 'Fortnight';
+                case 52: return 'Weekly';
+                case 365: return 'Daily';
+                default: return 'Unknown';
+            }
+        }
+ 
+ 
+        function fetchUsers() {
+            const factoryId = document.getElementById('factoryID').value;
+           
+            if (factoryId) {
+                fetch(`/admin/assign_task/get-users/${factoryId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const assignToSelect = document.getElementById('assignTo');
+                        const reviewerSelect = document.getElementById('reviewer');
+                       
+                        assignToSelect.innerHTML = '<option value="">Select a User</option>';
+                        reviewerSelect.innerHTML = '<option value="">Select a User</option>';
+                       
+                        data.forEach(user => {
+                            const option1 = new Option(user.user_name, user.user_id);
+                            const option2 = new Option(user.user_name, user.user_id);
+                            assignToSelect.add(option1);
+                            reviewerSelect.add(option2);
+                        });
+                    })
+                    .catch(error => console.error('Failed to fetch users:', error));
+            }
+        }
+ 
+        function showModal(message) {
+            document.getElementById('modalMessage').textContent = message;
+            const modal = document.getElementById("messageModal");
+            modal.style.display = "block";
+ 
+            const span = document.getElementsByClassName("close")[0];
+            span.onclick = function() {
+                modal.style.display = "none";
+            }
+ 
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+        }
+ 
+        document.addEventListener('DOMContentLoaded', function() {
+            const errorMessage = "{{ error_message | default('') | e }}";
+            const successMessage = "{{ success_message | default('') | e }}";
+ 
+            if (errorMessage && errorMessage !== "None") {
+                showModal(errorMessage);
+            } else if (successMessage && successMessage !== "None") {
+                showModal(successMessage);
+            }
+        });
+    </script>
+</body>
+</html>

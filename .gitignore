@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.env
+credentials.json
+token.json
+instance/
+.DS_Store
+.dockerignore
+*.sqlite3
+*.db
+RCMS
+

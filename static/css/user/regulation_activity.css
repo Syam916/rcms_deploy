@@ -1,0 +1,160 @@
+/* General Page and Container Styling */
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #7F7FD5, #86A8E7, #91EAE4);
+    background-size: cover;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 1200px;
+}
+
+/* Heading Styling */
+h1 {
+    text-align: center;
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+thead {
+    background-color: #f8f9fa;
+}
+
+th, td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+    color: #333;
+    font-size: 16px;
+}
+
+td {
+    font-size: 14px;
+}
+
+td textarea {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px;
+    resize: none;
+}
+
+td select {
+    padding: 6px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 100%;
+    font-size: 14px;
+}
+
+td button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+td button:hover {
+    background-color: #007BFF;
+    color: white;
+}
+
+/* Upload Button Styling */
+.upload-button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.upload-button:hover {
+    background-color: #218838;
+}
+
+/* Submit Button */
+.submit-button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.submit-button:hover {
+    background-color: #218838;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    th, td {
+        padding: 8px;
+    }
+    
+    td textarea {
+        font-size: 12px;
+    }
+    
+    td select {
+        font-size: 12px;
+    }
+    
+    td button {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    table {
+        font-size: 12px;
+    }
+    
+    th, td {
+        padding: 5px;
+    }
+
+    td textarea {
+        font-size: 10px;
+    }
+
+    td select {
+        font-size: 10px;
+    }
+
+    td button {
+        font-size: 10px;
+        padding: 6px;
+    }
+}

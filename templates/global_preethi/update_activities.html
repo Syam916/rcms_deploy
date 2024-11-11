@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Activity</title>
+
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pop-up.css') }}">
+    <link rel="stylesheet" href="static/css/Global/add_activity.css">
+
+    <!-- Styling -->
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #71b7e6, #9b59b6);
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            padding-top: 20px;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: left;
+            overflow: auto;
+        }
+        /* Display the entity_id and user_id */
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .form-header .entity-id,
+        .form-header .user-id {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .form-header strong {
+            font-weight: bold; /* Making the labels bold */
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+            color: #4a4a4a;
+        }
+
+        .form-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            width: 30%;
+        }
+
+        input[type="text"], input[type="button"], input[type="number"], input[type="date"], select {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            width: 65%;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .buttons input[type="button"], .buttons input[type="submit"] {
+            padding: 12px;
+            width: 48%;
+            border: none;
+            color: #fff;
+            background-color: #5cb85c;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        input[type="button"]:hover {
+            background-color: #4cae4c;
+        }
+
+        .back-button {
+            background-color: #f0ad4e;
+        }
+
+        .back-button:hover {
+            background-color: #ec971f;
+        }
+
+        .fetch-btn {
+            background-color: #5bc0de;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .fetch-btn:hover {
+            background-color: #31b0d5;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .input-group input, select {
+            flex: 1;
+        }
+
+        .input-group .fetch-btn {
+            width: auto;
+        }
+    </style>
+
+    <!-- JavaScript -->
+    <script>
+        // Function to set the frequency, documentupload_yes_no, criticality, and mandatory_optional in dropdowns when loading data from the server
+        function setFrequencyValue(frequencyValue) {
+            const frequencyDropdown = document.getElementById('frequencyDropdown');
+            frequencyDropdown.value = frequencyValue;
+        }
+
+        function setDocumentUploadValue(value) {
+            const documentUploadDropdown = document.getElementById('documentupload_yes_no');
+            documentUploadDropdown.value = value;
+        }
+
+        function setCriticalityValue(value) {
+            const criticalityDropdown = document.getElementById('criticality');
+            criticalityDropdown.value = value;
+        }
+
+        function setMandatoryOptionalValue(value) {
+            const mandatoryOptionalDropdown = document.getElementById('mandatory_optional');
+            mandatoryOptionalDropdown.value = value;
+        }
+
+        // Function to fetch activity details based on activity_id
+        function fetchActivityDetails() {
+            const regulation_id = document.getElementById("regulation_id").value;
+            const activity_id = document.getElementById("activity_id").value;
+
+            if (regulation_id && activity_id) {
+                fetch(`/update_main_activities_page/get_main_activity_details/${regulation_id}/${activity_id}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("Fetched Data:", data); // Debugging response
+
+                        document.getElementById("activity_description").value = data.activity_description || '';
+                        document.getElementById("criticality").value = data.criticality || '';
+                        document.getElementById("documentupload_yes_no").value = data.documentupload_yes_no || '';
+                        document.getElementById("frequencyDropdown").value = data.frequency || '';
+
+                        if (data.frequency_timeline) {
+                            document.getElementById("frequency_timeline").value = data.frequency_timeline;
+                        } else {
+                            document.getElementById("frequency_timeline").value = '';
+                        }
+
+                        document.getElementById("mandatory_optional").value = data.mandatory_optional || '';
+                        document.getElementById("ews").value = data.ews || '';
+                        document.getElementById("activity_id_hidden").value = activity_id;
+                    })
+                    .catch(error => console.error("Error fetching activity details:", error));
+            }
+        }
+
+        // Function to fetch activities based on regulation_id
+        function fetchActivities() {
+            const regulation_id = document.getElementById("regulation_id").value;
+
+            fetch(`/update_main_activities_page/populate_main_activities/${regulation_id}`)
+                .then(response => response.json())
+                .then(data => {
+                    const activityDropdown = document.getElementById("activity_id");
+                    activityDropdown.innerHTML = "";  // Clear existing options
+
+                    data.activities.forEach(activity => {
+                        const option = document.createElement("option");
+                        option.value = activity.activity_id;
+                        option.text = activity.activity;
+                        activityDropdown.add(option);
+                    });
+
+                    if (data.activities.length > 0) {
+                        fetchActivityDetails(data.activities[0].activity_id);
+                    }
+                });
+        }
+
+        // Automatically fetch details when an activity is selected
+        function onActivityChange() {
+            const activity_id = document.getElementById("activity_id").value;
+            fetchActivityDetails(activity_id);
+        }
+
+        // Function to handle form submission with confirmation
+        function handleFormSubmit(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            // SweetAlert confirmation before submission
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to update the activity?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',  // Make the confirm button blue
+                cancelButtonColor: '#3085d6',   // Make the cancel button blue as well
+                confirmButtonText: 'Yes, update it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Submit the form using AJAX
+                    const form = event.target;
+                    const formData = new FormData(form);
+
+                    fetch(form.action, {
+                        method: form.method,
+                        body: formData
+                    }).then(response => {
+                        if (response.ok) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Activity successfully updated!',
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                // Optionally, redirect to another page after success
+                                window.location.href = "/update_entity_activities_page";
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'An error occurred while updating the activity.',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    }).catch(error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'An error occurred: ' + error.message,
+                            confirmButtonText: 'OK'
+                        });
+                    });
+                }
+            });
+        }
+
+
+        // Event listener for form submission
+        document.addEventListener("DOMContentLoaded", function() {
+            const form = document.querySelector("form");
+            form.addEventListener("submit", handleFormSubmit);
+        });
+    </script>
+</head>
+<body>
+
+    <div class="container">
+         <!-- Displaying Entity ID and User ID at the top of the form -->
+         <div class="form-header">
+            <div class="entity-id"><strong>Entity ID:</strong> {{ entity_id }}</div>
+            <div class="user-id"><strong>User ID:</strong> {{ user_id }}</div>
+        </div>
+        <h1>Update Activity</h1>
+
+        <form method="POST" action="/update_main_activity">
+            <!-- Regulation Dropdown -->
+            <div class="form-group">
+                <label for="regulation_id">Regulation ID:</label>
+                <select id="regulation_id" name="regulation_id" onchange="fetchActivities()">
+                    <option value="">Select Regulation</option>
+                    <!-- This part will be populated by Flask with available regulations -->
+                    {% for regulation in regulations %}
+                        <option value="{{ regulation.regulation_id }}">{{ regulation.regulation_id }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Activity Dropdown -->
+            <div class="form-group">
+                <label for="activity_id">Activity:</label>
+                <select id="activity_id" name="activity_id" onchange="onActivityChange()">
+                    <option value="">Select Activity</option>
+                </select>
+            </div>
+
+            <!-- Hidden field to hold activity_id for form submission -->
+            <input type="hidden" id="activity_id_hidden" name="activity_id_hidden">
+
+            <!-- Activity Details -->
+            <div class="form-group">
+                <label for="activity_description">Activity Description:</label>
+                <input type="text" id="activity_description" name="activity_description" required>
+            </div>
+
+            <!-- Criticality Dropdown -->
+            <div class="form-group">
+                <label for="criticality">Criticality:</label>
+                <select id="criticality" name="criticality" required>
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                </select>
+            </div>
+
+            <!-- Document Upload Dropdown -->
+            <div class="form-group">
+                <label for="documentupload_yes_no">Document Upload:</label>
+                <select id="documentupload_yes_no" name="documentupload_yes_no" required>
+                    <option value="Y">Yes</option>
+                    <option value="N">No</option>
+                </select>
+            </div>
+
+            <!-- Frequency Dropdown -->
+            <div class="form-group">
+                <label for="frequency">Frequency:</label>
+                <select id="frequencyDropdown" name="frequency" required>
+                    <option value="0">Only once</option>
+                    <option value="1">Annually</option>
+                    <option value="2">Semi-Annually</option>
+                    <option value="3">Every 4 Months</option>
+                    <option value="4">Quarterly</option>
+                    <option value="6">Every 2 months</option>
+                    <option value="12">Monthly</option>
+                    <option value="26">Fortnight</option>
+                    <option value="52">Weekly</option>
+                    <option value="365">Daily</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="frequency_timeline">Frequency Timeline:</label>
+                <input type="date" id="frequency_timeline" name="frequency_timeline" required>
+            </div>
+
+            <!-- Mandatory/Optional Dropdown -->
+            <div class="form-group">
+                <label for="mandatory_optional">Mandatory/Optional:</label>
+                <select id="mandatory_optional" name="mandatory_optional" required>
+                    <option value="M">Mandatory</option>
+                    <option value="O">Optional</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="ews">EWS:</label>
+                <input type="number" id="ews" name="ews" min="1" required>
+            </div>
+
+            <!-- Update Button -->
+            <div class="buttons">
+                <input type="submit" value="Update">
+                <input type="button" class="back-button" value="Back" onclick="window.location.href='/global_admin_dashboard';">
+            </div>
+        </form>
+    </div>
+
+    <!-- Hidden divs to store success and error messages -->
+    <div id="success-message" style="display:none;">
+        {% if success_message %}
+            {{ success_message }}
+        {% endif %}
+    </div>
+
+    <div id="error-message" style="display:none;">
+        {% if error_message %}
+            {{ error_message }}
+        {% endif %}
+    </div>
+
+    <!-- Popup overlay and content -->
+    <div class="overlay" id="overlay" style="display: none;"></div>
+    <div class="popup" id="popup" style="display: none;">
+        <div id="popup-icon"></div>
+        <h2 id="popup-title"></h2>
+        <p id="popup-message"></p>
+        <button onclick="closePopup()" id="popup-button">Continue</button>
+    </div>
+
+    <!-- Load the popup.js script -->
+    <script src="{{ url_for('static', filename='js/popup.js') }}"></script>
+
+    <script>
+        checkMessages()
+    </script>
+
+
+</body>
+</html>

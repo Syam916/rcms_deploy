@@ -1,0 +1,153 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+   
+}
+
+body {
+    background: linear-gradient(to bottom, #2c59df 50%, #ebf0ff 50%); /* Half blue, half light color */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    /* margin: 20px; Add margin to separate it from the screen edges */
+    border: 20px solid white; /* Add white border */
+    border-radius: 10px;
+
+}
+
+
+.container {
+    display: flex;
+    background-color: white;
+    width: 900px;
+    height: 450px;
+    border-radius: 15px;
+    
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    
+}
+
+/* Left Panel - Login */
+.login-panel {
+    width: 50%;
+    padding: 60px 40px;
+    background-color: #f6f8ff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: left;
+}
+
+h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    font-size: 14px;
+    color: #555;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+    outline: none;
+    border-color: #4a90e2;
+}
+
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    color: #888;
+    font-size: 14px;
+}
+
+.forgot-password {
+    color: #4a90e2;
+    text-decoration: none;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.login-btn:hover {
+    background-color: #357ABD;
+}
+
+.signup-link {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #888;
+}
+
+.signup-link a {
+    color: #4a90e2;
+    text-decoration: none;
+}
+
+.signup-link a:hover {
+    text-decoration: underline;
+}
+
+/* Right Panel - Illustration */
+.illustration-panel {
+    width: 50%;
+    background-color: #ebf0ff;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.illustration-panel img {
+    margin-top: 5px;
+    max-width: 100%;
+    margin-bottom: 20px;
+    border-radius: 10%; /* Added border-radius */
+}
+
+
+.illustration-panel h3 {
+    font-size: 20px;
+    color: #333;
+    margin-top: 15px;
+}
+
+.illustration-panel p {
+    font-size: 14px;
+    color: #666;
+}

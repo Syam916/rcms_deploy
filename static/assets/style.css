@@ -1,0 +1,255 @@
+html, body {
+    overflow-x: hidden;
+    background-color: white;
+    font-family: 'Roboto', sans-serif;
+}
+
+.page-title {
+    text-align: center;
+    font-family: 'Roboto', sans-serif;
+    margin-top: 5px;
+}
+
+.main-wrapper {
+    overflow-y: scroll;
+}
+
+.main-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 5px;
+}
+
+.metric-row-span {
+    grid-column: span 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 2px 15px rgba(0, 0, 0, 0.15);
+}
+
+.activity-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: 0 auto;
+    margin-top: -20px;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.metric-heading {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: left;
+    padding-left: 20px;
+}
+
+.metric-title {
+    font-size: 18px;
+    color: #333;
+    font-weight: bold;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.two-columns {
+    width: 100%;
+    justify-content: space-between;
+}
+
+.metric-box {
+    width: 130px; /* Set a fixed width */
+    height: 140px; /* Set a fixed height */
+    text-align: center;
+    padding: 12px;
+    border: 1px solid #ddd;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background-color: white;
+    margin: 2px; /* Add margin between columns */
+}
+
+
+.two-sections {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.image-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+}
+
+.small-image {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 10px;
+}
+
+.heading-chart-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 2;
+
+}
+
+
+.metric-donut {
+    width: 80px;
+    height: 80px;
+    display: block;
+    margin: 0 auto;
+}
+
+.metric-value {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.completed {
+    color: #28a745;
+}
+
+.wip {
+    color: #007bff;
+}
+
+.wip-delay {
+    color: #ff3333;
+}
+
+.delay {
+    color: #FF9800;
+}
+
+.due {
+    color: #007bff;
+}
+
+.yet-to-start {
+    color: #888888;
+}
+
+.yet-to-start-delay {
+    color: #ffbf00;
+}
+
+.data-container {
+    width: 75vw;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    max-width: 100%;
+}
+
+.radio-container-wrapper {
+    margin-left: -2%;
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+    margin-top: -1%;
+}
+
+.radio-container {
+    display: inline-flex;
+    border: 1px solid #007bff;
+    border-radius: 8px;
+    overflow: hidden;
+    font-size: 13px;
+    font-family: 'Roboto', sans-serif;
+    flex-grow: 3;
+    justify-content: space-between;
+}
+
+.radio-button {
+    display: inline-block;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    text-align: center;
+    border-right: 1px solid #007bff;
+    white-space: nowrap;
+    flex-grow: 2;
+}
+
+.radio-button:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.charts-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 20px;
+    /* margin-left: -7%;
+    margin-top: -1%; */
+}
+
+.chart {
+    width: 38%;
+    height: 400px;
+    
+
+}
+
+.second-row-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    align-items: flex-start;
+    margin-top: -4%;
+    margin-left: -7%;
+}
+
+.table-container {
+    width: 120%;
+    padding: 10px;
+    /* background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
+}
+
+.table-heading {
+    font-size: 18px;
+    text-align: center;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.row-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.small-chart {
+    height: 200px;
+    width: 30%;
+    margin: 5px;
+}

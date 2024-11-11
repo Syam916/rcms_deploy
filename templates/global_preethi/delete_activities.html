@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Activities</title>
+
+    <!-- Include Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    <!-- Include SweetAlert2 for alerts -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #71b7e6, #9b59b6);
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 900px;
+            width: 100%;
+        }
+        /* Display the entity_id and user_id */
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .form-header .entity-id,
+        .form-header .user-id {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .form-header strong {
+            font-weight: bold; /* Making the labels bold */
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        input[type="button"] {
+            padding: 10px;
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        input[type="button"]:hover {
+            background-color: #4cae4c;
+        }
+        /* Flexbox layout for form group */
+        .form-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-right: 10px;
+            min-width: 150px;
+        }
+
+        select {
+            width: 250px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        /* Style for Select2 */
+        .select2-container .select2-selection--single {
+            height: 38px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container"><!-- Displaying Entity ID and User ID at the top of the form -->
+        <div class="form-header">
+           <div class="entity-id"><strong>Entity ID:</strong> {{ entity_id }}</div>
+           <div class="user-id"><strong>User ID:</strong> {{ user_id }}</div>
+       </div>
+        <h1>Delete Activities</h1>
+    
+        <label for="regulationSelect">Select Regulation:</label>
+        <select id="regulationSelect" class="searchable-dropdown" onchange="fetchActivities()">
+            <option value="">Select Regulation</option>
+        </select>
+    
+        <!-- Message to show when no activities are available -->
+        <p id="noActivitiesMessage" style="display:none; color: red; text-align: center;">No activities available for the selected regulation.</p>
+    
+        <table id="activityTable" style="display:none; margin-top: 20px;">
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Activity Name</th>
+                </tr>
+            </thead>
+            <tbody id="activityBody"></tbody>
+        </table>
+    
+        <div class="buttons">
+            <input type="button" value="Delete Selected" onclick="confirmDelete()">
+            <input type="button" value="Back" onclick="window.location.href='/global_admin_dashboard';">
+        </div>
+    </div>
+    
+    <!-- Include jQuery and Select2 JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
+    <script>
+        // Initialize Select2 on page load
+        $(document).ready(function() {
+            $('.searchable-dropdown').select2();
+        });
+
+        // Fetch regulations on page load
+        window.onload = function() {
+            fetch('/populate_main_regulations')
+                .then(response => response.json())
+                .then(data => {
+                    const regulationSelect = document.getElementById('regulationSelect');
+                    data.forEach(regulation => {
+                        const option = document.createElement('option');
+                        option.value = regulation.regulation_id;
+                        option.textContent = regulation.regulation_name;
+                        regulationSelect.appendChild(option);
+                    });
+                    // Refresh Select2 to reflect the new options
+                    $('#regulationSelect').trigger('change');
+                });
+        }
+
+        // Fetch activities based on selected regulation
+        function fetchActivities() {
+            const regulationId = document.getElementById('regulationSelect').value;
+            if (regulationId) {
+                fetch(`/load_main_activities/${regulationId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const activityTable = document.getElementById('activityTable');
+                        const activityBody = document.getElementById('activityBody');
+                        activityBody.innerHTML = ''; // Clear previous activities
+                        const noActivitiesMessage = document.getElementById('noActivitiesMessage');
+
+                        if (data.length > 0) {
+                            activityTable.style.display = 'table';
+                            noActivitiesMessage.style.display = 'none';
+                            data.forEach(activity => {
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                                    <td><input type="checkbox" name="activity_ids" value="${activity.activity_id}"></td>
+                                    <td>${activity.activity}</td>
+                                `;
+                                activityBody.appendChild(row);
+                            });
+                        } else {
+                            activityTable.style.display = 'none';
+                            noActivitiesMessage.style.display = 'block';
+                        }
+                    });
+            }
+        }
+
+        // Confirm and delete selected activities
+        function confirmDelete() {
+            const regulationId = document.getElementById('regulationSelect').value;
+            const checkboxes = document.querySelectorAll('input[name="activity_ids"]:checked');
+            
+            if (!regulationId || checkboxes.length === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Please select a regulation and at least one activity to delete!'
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to delete the selected activities?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const formData = new FormData();
+                    formData.append('regulation_id', regulationId);
+                    checkboxes.forEach(checkbox => {
+                        formData.append('activity_ids', checkbox.value);
+                    });
+
+                    fetch('/delete_main_activities', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.message) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted!',
+                                text: data.message
+                            }).then(() => {
+                                // After deletion, refresh the activities list
+                                fetchActivities();
+                            });
+                        } else if (data.error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: data.error
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+</html>

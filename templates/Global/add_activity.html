@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regulation Checklist Form</title>
+    <!-- <link rel="stylesheet" href="static/css/Global/add_activity.css"> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pop-up.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bubble.css') }}">
+    
+    <style>
+        /* Ensuring the body takes the full height and centers the content */
+        body {
+    background: linear-gradient(to right, #1E90FF, #87CEEB); /* Blue gradient */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    position: relative; /* Necessary for the bubbles to be placed relative to the body */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+        .image-container {
+            max-width: 500px;
+            width: 130%;
+            /* margin-right: 15%; */
+        }
+
+        .image-container img {
+            max-width: 130%;
+            border-radius: 15px;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Scrollable form section */
+        form {
+            overflow-y: auto;
+            max-height: 400px; /* Adjust this height as needed to ensure the form fits */
+            padding-right: 15px; /* Space for scrollbar */
+            margin-bottom: 60px; /* Ensure space for buttons */
+        }
+
+        .buttons {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 10px 0;
+            background-color: white;
+        }
+
+        .buttons input[type="submit"],
+        .buttons input[type="button"] {
+            padding: 10px 20px;
+            background-color: #1E90FF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .buttons input[type="submit"]:hover,
+        .buttons input[type="button"]:hover {
+            background-color: #007ACC;
+        }
+
+        /* Form label and input styling */
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"], input[type="date"], input[type="number"], textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        /* Two-column layout for the rows */
+        .row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .column {
+            width: 48%;
+        }
+
+        .image-container {
+            max-width: 500px;
+            width: 100%;
+            position: absolute;
+            right: -20px;
+            top: 50px;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Bubbles -->
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    
+    <div class="container">
+        <!-- Displaying Entity ID and User ID at the top of the form -->
+        <div class="form-header">
+            <div class="entity-id"><strong>Entity ID:</strong> {{ entity_id }}</div>
+            <div class="user-id"><strong>User ID:</strong> {{ user_id }}</div>
+        </div>
+        <h1>Add Activity</h1>
+        <form action="/submit-checklist" method="POST">
+            <label for="regulationName">Regulation Name:</label>
+            <select id="regulationName" name="regulationName" required onchange="fetchRegulationID();">
+                <option value="">Select Regulation Name</option>
+                {% for regulation in regulations %}
+                    <option value="{{ regulation[1] }}">{{ regulation[1] }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="regulationID">Regulation ID:</label>
+            <input type="text" id="regulationID" name="regulationID" readonly>
+
+            <label for="activity">Activity:</label>
+            <input type="text" id="activity" name="activity" required>
+
+            <!-- Mandatory/Optional and Document Upload in one row -->
+            <div class="row">
+                <div class="column">
+                    <label for="mandatoryOptional">Mandatory/Optional:</label>
+                    <select id="mandatoryOptional" name="mandatoryOptional" required>
+                        <option value="">Select Option</option>
+                        <option value="M">Mandatory</option>
+                        <option value="O">Optional</option>
+                    </select>
+                </div>
+
+                <div class="column">
+                    <label for="documentupload_yes_no">Document Upload (Yes/No):</label>
+                    <select id="documentupload_yes_no" name="documentupload_yes_no">
+                        <option value="">Select Option</option>
+                        <option value="Y">Yes</option>
+                        <option value="N">No</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Frequency and Frequency Timeline in one row -->
+            <div class="row">
+                <div class="column">
+                    <label for="frequency">Frequency:</label>
+                    <select id="frequency" name="frequency" required>
+                        <option value="">Select Frequency</option>
+                        <option value="1">Annually</option>
+                        <option value="2">Half Yearly</option>
+                        <option value="3">Every 4 Months</option>
+                        <option value="4">Quarterly</option>
+                        <option value="12">Monthly</option>
+                        <option value="26">Fortnight</option>
+                        <option value="52">Weekly</option>
+                        <option value="365">Daily</option>
+                    </select>
+                </div>
+
+                <div class="column">
+                    <label for="frequencyTimeline">Frequency Timeline:</label>
+                    <input type="date" id="frequencyTimeline" name="frequencyTimeline" required>
+                </div>
+            </div>
+
+            <!-- Criticality and Early Warning Days in one row -->
+            <div class="row">
+                <div class="column">
+                    <label for="criticalNonCritical">Criticality:</label>
+                    <select id="criticalNonCritical" name="criticalNonCritical" required>
+                        <option value="">Select Option</option>
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </div>
+
+                <div class="column">
+                    <label for="EWS">Early Warning Days:</label>
+                    <input type="number" id="EWS" name="EWS" required>
+                </div>
+            </div>
+
+            <label for="activityDescription">Activity Description:</label>
+            <textarea id="activityDescription" name="activityDescription" rows="4" required></textarea>
+
+            <div class="buttons">
+                <input type="submit" value="Submit">
+                <input type="button" value="Back" onclick="window.location.href='/global_admin_dashboard';">
+            </div>
+        </form>
+
+        
+    </div>
+
+    <div class="image-container">
+        <img src="static/images/bg_12.png" alt="Regulation Image" class="form-filling-image">
+    </div>
+
+    
+    <!-- Hidden divs to store success and error messages -->
+    <div id="error-type" style="display:none;">
+        {% if error_type %}
+            {{ error_type }}
+        {% endif %}
+    </div>
+
+    <div id="remarks" style="display:none;">
+        {% if remarks %}
+            {{ remarks }}
+        {% endif %}
+    </div>
+
+    <!-- Popup overlay and content -->
+    <div class="overlay" id="overlay" style="display: none;"></div>
+    <div class="popup" id="popup" style="display: none;">
+        <div id="popup-icon"></div>
+        <h2 id="popup-title"></h2>
+        <p id="popup-message"></p>
+        <button onclick="closePopup()" id="popup-button">Continue</button>
+    </div>
+    <script src="{{ url_for('static', filename='js/popup.js') }}"></script>
+
+    <script>
+        function fetchRegulationID() {
+            const regulationName = document.getElementById('regulationName').value;
+
+            if (regulationName) {
+                fetch(`/checklists/get-regulation-id/${regulationName}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const regulationIDInput = document.getElementById('regulationID');
+                        regulationIDInput.value = data.regulation_id || '';
+                    })
+                    .catch(error => console.error('Error:', error));
+            } else {
+                console.error('Please select a regulation name.');
+            }
+        }
+
+        // Function to check for messages using error_type and remarks
+        function checkMessages() {
+            const errorType = document.getElementById('error-type') ? document.getElementById('error-type').innerText.trim() : '';
+            const remarks = document.getElementById('remarks') ? document.getElementById('remarks').innerText.trim() : '';
+
+            if (errorType && remarks) {
+                showPopup(errorType, remarks);
+            }
+        }
+
+        window.onload = checkMessages;
+    </script>
+</body>
+</html>

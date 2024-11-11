@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reassign Task</title>
+    <style>
+        /* Add your styling here */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #71b7e6, #9b59b6);
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            padding-top: 20px;
+        }
+ 
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: left;
+            overflow: auto;
+        }
+ 
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+            color: #4a4a4a;
+        }
+ 
+        label {
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            display: block;
+        }
+ 
+        .row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            gap: 10px;
+        }
+ 
+        .column {
+            width: 48%;
+        }
+ 
+        .column label, .column input[type="text"], .column select {
+            width: 100%;
+            display: block;
+        }
+ 
+        input[type="text"], select {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+ 
+        input[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            background-color: #5cb85c;
+            border: none;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+ 
+        input[type="submit"]:hover {
+            background-color: #4cae4c;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        function updateDropdowns() {
+    var formData = {
+        factoryID: $('#factoryID').val(),
+        userID: $('#userID').val(),
+        regulationID: $('#regulationID').val(),
+        activity: $('#activity').val(),
+        dueTo: $('#dueTo').val(),  // Ensure the dueTo value is passed
+        assignTo: $('#assignTo').val(),  // Pass assignTo value
+        reviewer: $('#reviewer').val()  // Pass reviewer value
+    };
+ 
+    $.ajax({
+        url: '/reassign',
+        type: 'GET',
+        data: formData,
+        success: function(response) {
+            $('body').html(response);  // Update the entire body content
+        }
+    });
+}
+ 
+$(document).ready(function() {
+    // Attach the onchange event to all dropdowns
+    $('#factoryID, #userID, #regulationID, #activity, #dueTo, #assignTo, #reviewer').on('change', function() {
+        updateDropdowns();
+    });
+});
+       
+ 
+ 
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Task Reasignment</h1>
+        <form action="/reassign" method="GET">
+            <label for="factoryID">Factory ID:</label>
+            <select id="factoryID" name="factoryID">
+                <option value="">Select a Factory</option>
+                {% for factory in factories %}
+                    <option value="{{ factory[0] }}" {% if request.args.get('factoryID') == factory[0] %}selected{% endif %}>{{ factory[0] }}</option>
+                {% endfor %}
+            </select>
+ 
+            <label for="userID">User ID:</label>
+            <select id="userID" name="userID">
+                <option value="">Select a User</option>
+                {% for user in users %}
+                    <option value="{{ user[0] }}" {% if request.args.get('userID') == user[0] %}selected{% endif %}>{{ user[0] }}</option>
+                {% endfor %}
+            </select>
+ 
+            <label for="regulationID">Regulation ID:</label>
+            <select id="regulationID" name="regulationID">
+                <option value="">Select a Regulation</option>
+                {% for regulation in regulations %}
+                    <option value="{{ regulation[0] }}" {% if request.args.get('regulationID') == regulation[0] %}selected{% endif %}>{{ regulation[0] }}</option>
+                {% endfor %}
+            </select>
+ 
+            <label for="activity">Activity:</label>
+            <select id="activity" name="activity">
+                <option value="">Select an Activity</option>
+                {% for activity in activities %}
+                    <option value="{{ activity[0] }}" {% if request.args.get('activity') == activity[0] %}selected{% endif %}>{{ activity[0] }}</option>
+                {% endfor %}
+            </select>
+ 
+ 
+            <label for="assignTo">Reassign To:</label>
+            <select id="assignTo" name="assignTo">
+                <option value="">Select a User</option>
+                {% for user in reassignto %}
+                    <option value="{{ user[0] }}" {% if request.args.get('assignTo') == user[0] %}selected{% endif %}>{{ user[0] }}</option>
+                {% endfor %}
+            </select>
+ 
+            <label for="reviewer">Reassign Reviewer To:</label>
+            <select id="reviewer" name="reviewer">
+                <option value="">Select a User</option>
+                {% for user in review_reassignto %}
+                    <option value="{{ user[0] }}" {% if request.args.get('reviewer') == user[0] %}selected{% endif %}>{{ user[0] }}</option>
+                {% endfor %}
+            </select>
+ 
+ 
+            <label for="dueTo">Due Date:</label>
+            <select id="dueTo" name="dueTo">
+            <option value="">Select a Due Date</option>
+            {% for due_date in due_dates %}
+                 <option value="{{ due_date[0] }}"
+            {% if selected_due_on == due_date[0] %}selected{% endif %}>
+            {{ due_date[0] }}
+            </option>
+            {% endfor %}
+            </select>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+</body>
+</html>

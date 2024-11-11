@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pop-up.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bubble.css') }}">
+    <title>Reassign Task</title>
+    <style>
+body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(to right, #1E90FF, #87CEEB); /* Blue gradient */
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            padding-top: 20px;
+        }
+        .image-container {
+            max-width: 500px;
+            width: 130%;
+        }
+
+        .image-container img {
+            max-width: 130%;
+            border-radius: 15px;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: left;
+            overflow: auto;
+        }
+
+        /* Display the entity_id and user_id */
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .form-header .entity-id,
+        .form-header .user-id {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .form-header strong {
+            font-weight: bold;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+            color: #4a4a4a;
+        }
+
+        label {
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            gap: 10px;
+        }
+
+        .column {
+            width: 48%;
+        }
+
+        .column label, .column input[type="text"], .column select {
+            width: 100%;
+            display: block;
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"], .button-green {
+            width: 100%;
+            padding: 12px;
+            background-color: #5cb85c;
+            border: none;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        input[type="submit"]:hover, .button-green:hover {
+            background-color: #4cae4c;
+        }
+
+        /* Styles for flash messages */
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+
+        .alert-success {
+            color: #3c763d;
+            background-color: #dff0d8;
+            border-color: #d6e9c6;
+        }
+
+        .alert-error {
+            color: #a94442;
+            background-color: #f2dede;
+            border-color: #ebccd1;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        function updateDropdowns() {
+            var formData = {
+                userID: $('#userID').val(),
+                regulationID: $('#regulationID').val(),
+                activity: $('#activity').val(),
+                dueTo: $('#dueTo').val(),  // Ensure the dueTo value is passed
+                assignTo: $('#assignTo').val(),  // Pass assignTo value
+                reviewer: $('#reviewer').val()  // Pass reviewer value
+            };
+
+            $.ajax({
+                url: '/reassign',
+                type: 'GET',
+                data: formData,
+                success: function(response) {
+                    $('body').html(response);  // Update the entire body content
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            // Attach the onchange event to all dropdowns
+            $('#userID, #regulationID, #activity, #dueTo, #assignTo, #reviewer').on('change', function() {
+                updateDropdowns();
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="container">
+
+        <!-- Displaying Entity ID and User ID at the top of the form -->
+        <div class="form-header">
+            <div class="entity-id"><strong>Entity ID:</strong> {{ task_entity_id }}</div>
+            <div class="user-id"><strong>User ID:</strong> {{ task_user_id }}</div>
+        </div>
+        <h1>Task Reassignment</h1>
+        <form action="/reassign" method="GET">
+            <label for="userID">User ID:</label>
+            <select id="userID" name="userID" required>
+                <option value="">Select a User</option>
+                {% for user in users %}
+                    <option value="{{ user[0] }}" {% if request.args.get('userID') == user[0] %}selected{% endif %}>{{ user[0] }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="regulationID">Regulation ID:</label>
+            <select id="regulationID" name="regulationID" required>
+                <option value="">Select a Regulation</option>
+                {% for regulation in regulations %}
+                    <option value="{{ regulation[0] }}" {% if request.args.get('regulationID') == regulation[0] %}selected{% endif %}>{{ regulation[0] }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="activity">Activity:</label>
+            <select id="activity" name="activity" required>
+                <option value="">Select an Activity</option>
+                {% for activity in activities %}
+                    <option value="{{ activity[0] }}" {% if request.args.get('activity') == activity[0] %}selected{% endif %}>{{ activity[0] }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="assignTo">Reassign To:</label>
+            <select id="assignTo" name="assignTo" required>
+                <option value="">Select a User</option>
+                {% for user in reassignto %}
+                    <option value="{{ user[0] }}" {% if request.args.get('assignTo') == user[0] %}selected{% endif %}>{{ user[0] }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="reviewer">Reassign Reviewer To:</label>
+            <select id="reviewer" name="reviewer" required>
+                <option value="">Select a User</option>
+                {% for user in review_reassignto %}
+                    <option value="{{ user[0] }}" {% if request.args.get('reviewer') == user[0] %}selected{% endif %}>{{ user[0] }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="dueTo">Due Date:</label>
+            <select id="dueTo" name="dueTo" required>
+                <option value="">Select a Due Date</option>
+                {% for due_date in due_dates %}
+                     <option value="{{ due_date[0] }}"
+                    {% if selected_due_on == due_date[0] %}selected{% endif %}>
+                    {{ due_date[0] }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <div class="row" style="margin-top: 20px;"> <!-- Ensures spacing from above elements -->
+                <input type="submit" value="Submit" class="button button-green">
+                <!-- Direct Link Back Button -->
+                <button type="button" onclick="window.location.href='/entity_admin_dashboard';" class="button button-green">Back</button>
+            </div>
+            <!-- Display success and error messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div id="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        </form>
+    </div>
+    <div class="image-container">
+        <img src="static/images/bg_12.png" alt="Person filling form" class="form-filling-image2">
+    </div>
+
+    <!-- Hidden divs to store success and error messages -->
+    <div id="success-message" style="display:none;">
+        {% if success_message %}
+            {{ success_message }}
+        {% endif %}
+    </div>
+
+    <div id="error-message" style="display:none;">
+        {% if error_message %}
+            {{ error_message }}
+        {% endif %}
+    </div>
+
+    <!-- Popup overlay and content -->
+    <div class="overlay" id="overlay" style="display: none;"></div>
+    <div class="popup" id="popup" style="display: none;">
+        <div id="popup-icon"></div>
+        <h2 id="popup-title"></h2>
+        <p id="popup-message"></p>
+        <button onclick="closePopup()" id="popup-button">Continue</button>
+    </div>
+
+    <!-- Load the popup.js script -->
+    <script src="{{ url_for('static', filename='js/popup.js') }}"></script>
+
+    <script>
+        checkMessages()
+    </script>
+</body>
+</html>

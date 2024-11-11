@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Regulation</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- Include SweetAlert -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pop-up.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bubble.css') }}">
+    <style>
+        body {
+    background: linear-gradient(to right, #1E90FF, #87CEEB); /* Blue gradient */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    position: relative; /* Necessary for the bubbles to be placed relative to the body */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+        .image-container {
+            max-width: 500px;
+            width: 130%;
+            margin-right: 15%;
+        }
+
+        .image-container img {
+            max-width: 130%;
+            border-radius: 15px;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+        /* Display the entity_id and user_id */
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .form-header .entity-id,
+        .form-header .user-id {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .form-header strong {
+            font-weight: bold; /* Making the labels bold */
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+        }
+        input[type="text"], select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 30px; /* Spacing between fields */
+            margin-bottom: 20px;
+        }
+        .form-row .form-group {
+            flex: 1;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center; /* Center align buttons */
+            gap: 10px; /* Space between buttons */
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px; /* Adjust button padding */
+            background-color: #1E90FF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #007ACC;
+        }
+        .fetch-btn {
+            padding: 10px 20px; /* Adjust Fetch button size */
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="container">
+        <!-- Displaying Entity ID and User ID at the top of the form -->
+         <div class="form-header">
+            <div class="entity-id"><strong>Entity ID:</strong> {{ entity_id }}</div>
+            <div class="user-id"><strong>User ID:</strong> {{ user_id }}</div>
+        </div>
+        <h1>Update Regulation</h1>
+        <!-- Flash messages for errors/success -->
+        
+
+        <!-- Regulation Fetch Form -->
+        <form method="POST" action="{{ url_for('fetch_main_regulation') }}">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="regulationName">Select Regulation Name:</label>
+                    <select id="regulationName" name="regulation_name" required>
+                        <option value="" disabled {% if not regulation %}selected{% endif %}>Select a regulation</option>
+                        {% for reg in regulations %}
+                            <option value="{{ reg.regulation_name }}" 
+                                {% if regulation and reg.regulation_name == regulation.regulation_name %}selected{% endif %}>
+                                {{ reg.regulation_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label> <!-- Placeholder to align button with input -->
+                    <button type="submit" class="fetch-btn" name="fetch_regulation">Fetch Regulation</button>
+                    <button type="button" class="back-btn" onclick="window.location.href='/global_admin_dashboard';">Back</button>
+                </div>
+            </div>
+        </form>
+        
+
+        {% if regulation %}
+        <!-- Display form when the regulation is fetched -->
+        <form method="POST" action="{{ url_for('update_main_regulation') }}">
+
+            <!-- Regulation ID and Category ID (side by side) -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="regulationId">Regulation ID:</label>
+                    <input type="text" id="regulationId" name="regulation_id" value="{{ regulation.regulation_id }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="categoryId">Category ID:</label>
+                    <input type="text" id="categoryId" name="category_id" value="{{ regulation.category_id }}" readonly>
+                </div>
+            </div>
+
+            <!-- Regulatory Body and Internal/External (side by side) -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="regulatoryBody">Regulatory Body:</label>
+                    <input type="text" id="regulatoryBody" name="regulatory_body" value="{{ regulation.regulatory_body }}">
+                </div>
+                <div class="form-group">
+                    <label for="internalExternal">Internal/External:</label>
+                    <select id="internalExternal" name="internal_external" required>
+                        <option value="I" {% if regulation.internal_external == 'I' %}selected{% endif %}>Internal</option>
+                        <option value="E" {% if regulation.internal_external == 'E' %}selected{% endif %}>External</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- National/International and Mandatory/Optional (side by side) -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="nationalInternational">National/International:</label>
+                    <select id="nationalInternational" name="national_international" required>
+                        <option value="N" {% if regulation.national_international == 'N' %}selected{% endif %}>National</option>
+                        <option value="I" {% if regulation.national_international == 'I' %}selected{% endif %}>International</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="mandatoryOptional">Mandatory/Optional:</label>
+                    <select id="mandatoryOptional" name="mandatory_optional" required>
+                        <option value="M" {% if regulation.mandatory_optional == 'M' %}selected{% endif %}>Mandatory</option>
+                        <option value="O" {% if regulation.mandatory_optional == 'O' %}selected{% endif %}>Optional</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Effective From and Obsolete/Current (side by side) -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="effectiveFrom">Effective From:</label>
+                    <input type="text" id="effectiveFrom" name="effective_from" value="{{ regulation.effective_from }}" readonly required>
+                </div>
+                <div class="form-group">
+                    <label for="obsoleteCurrent">Obsolete/Current:</label>
+                    <select id="obsoleteCurrent" name="obsolete_current" required>
+                        <option value="Current" {% if regulation.obsolete_current == 'Current' %}selected{% endif %}>Current</option>
+                        <option value="Obsolete" {% if regulation.obsolete_current == 'Obsolete' %}selected{% endif %}>Obsolete</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Buttons aligned at the center -->
+            <div class="buttons">
+                <button type="submit" name="update_regulation">Update Regulation</button>
+            </div>
+        </form>
+        {% endif %}
+    </div>
+
+    <div class="image-container">
+        <img src="static/images/bg_12.png" alt="Person filling form" class="form-filling-image2">
+    </div>
+
+    <div id="error-type" style="display:none;">
+        {% if error_type %}
+            {{ error_type }}
+        {% endif %}
+    </div>
+
+    <div id="remarks" style="display:none;">
+        {% if remarks %}
+            {{ remarks }}
+        {% endif %}
+    </div>
+
+    <!-- Popup overlay and content -->
+    <div class="overlay" id="overlay" style="display: none;"></div>
+    <div class="popup" id="popup" style="display: none;">
+        <div id="popup-icon"></div>
+        <h2 id="popup-title"></h2>
+        <p id="popup-message"></p>
+        <button onclick="closePopup()" id="popup-button">Continue</button>
+    </div>
+
+    <!-- Load the popup.js script -->
+    <script src="{{ url_for('static', filename='js/popup.js') }}"></script>
+
+    <script>
+        const regulationSelect = document.getElementById('regulationName');
+    
+        regulationSelect.addEventListener('change', function() {
+            console.log('Selected regulation:', this.value);
+        });
+    </script>
+    
+    <script>
+        checkMessages()
+    </script>
+</body>
+</html>

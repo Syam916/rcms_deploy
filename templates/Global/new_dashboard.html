@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="static/css/Global/global_dash_html.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <!-- <img src="static/images/nav_images/img1.webp" alt="Image 1">
+            <img src="static/images/nav_images/img2.webp" alt="Image 2">
+            <img src="static/images/nav_images/img3.webp" alt="Image 3">
+            <img src="static/images/nav_images/img4.webp" alt="Image 4">
+            <img src="static/images/nav_images/img5.webp"alt="Image 5">
+            <img src="static/images/nav_images/img11.webp"alt="Image 5">
+            <img src="static/images/nav_images/img12.webp"alt="Image 5">
+            <img src="static/images/nav_images/img13.webp"alt="Image 5">
+            <img src="static/images/nav_images/img17.webp"alt="Image 5">
+            <img src="static/images/nav_images/img18.webp"alt="Image 5"> -->
+
+
+        </div>
+
+        <div class="nav-center">
+            <h1>Global Admin Dashboard</h1>
+        </div>
+
+        <div class="nav-right">
+            <!-- <img src="static/images/nav_images/img6.webp" alt="Image 6">
+            <img src="static/images/nav_images/img7.webp" alt="Image 7">
+            <img src="static/images/nav_images/img8.webp" alt="Image 8">
+            <img src="static/images/nav_images/img9.webp" alt="Image 9">
+            <img src="static/images/nav_images/img14.webp"alt="Image 5">
+            <img src="static/images/nav_images/img15.webp"alt="Image 5">
+            <img src="static/images/nav_images/img16.webp"alt="Image 5"> -->
+
+            <div class="profile-menu">
+                <img src="static/images/nav_icon.webp" alt="Profile Icon" class="profile-icon">
+                <span class="menu-icon">&#9776;</span> <!-- Hamburger Menu Icon -->
+                <div class="dropdown">
+                    <ul>
+                        
+                        <li>Entity
+                            <ul class="sub-dropdown">
+                                <li><a href="{{ url_for('add_entity') }}" class="action-button">Add</a></li>
+                                <li><a href="{{ url_for('update_entity_page') }}" class="action-button">Modify</a></li>
+                                <li><a href="{{ url_for('delete_entity_page') }}" class="action-button">Delete</a></li>
+                            </ul>
+                        </li>
+                        <li>Category
+                            <ul class="sub-dropdown">
+                                <li><a href="{{ url_for('add_category_global') }}" class="action-button">Add</a></li>
+                                <li><a href="{{ url_for('display_main_categories') }}" class="action-button">Delete</a></li>
+                            </ul>
+                        </li>
+                        <li>Regulation
+                            <ul class="sub-dropdown">
+                                <li><a href="{{ url_for('add_regulation_global') }}" class="action-button">Add</a></li>
+                                <li><a href="{{ url_for('edit_main_regulation_page') }}" class="action-button">Modify</a></li>
+                                <li><a href="{{ url_for('delete_main_regulations_page') }}" class="action-button">Delete</a></li>
+                            </ul>
+                        </li>
+                        <li>Activity
+                            <ul class="sub-dropdown">
+                                <li><a href="{{ url_for('add_activity_global') }}" class="action-button">Add</a></li>
+                                <li><a href="{{ url_for('update_main_activities_page') }}" class="action-button">Modify</a></li>
+                                <li><a href="{{ url_for('delete_main_activities_page') }}" class="action-button">Delete</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Plotly Dashboard iframe -->
+    <div class="dashboard-container">
+        <iframe src="/admin-dashboard/" style="width: 100%; height: 200%; border: none;" frameborder="0"></iframe>
+    </div>
+
+</body>
+</html>

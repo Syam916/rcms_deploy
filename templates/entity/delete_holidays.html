@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Holidays</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pop-up.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bubble.css') }}">
+
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(to right, #1E90FF, #87CEEB); /* Blue gradient */
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            padding-top: 20px;
+        }
+        .image-container {
+            max-width: 500px;
+            width: 130%;
+        }
+
+        .image-container img {
+            max-width: 130%;
+            border-radius: 15px;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+        /* Display the entity_id and user_id */
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .form-header .entity-id,
+        .form-header .user-id {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .form-header strong {
+            font-weight: bold; /* Making the labels bold */
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        input[type="button"] {
+            padding: 10px;
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        input[type="button"]:hover {
+            background-color: #4cae4c;
+        }
+        /* Flexbox layout for form group */
+        .form-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-right: 10px;
+            min-width: 150px; /* Ensure label has enough width */
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Displaying Entity ID and User ID at the top of the form -->
+        <div class="form-header">
+            <div class="entity-id"><strong>Entity ID:</strong> {{ entity_id }}</div>
+            <div class="user-id"><strong>User ID:</strong> {{ user_id }}</div>
+        </div>
+        
+        <h1>Delete Holidays</h1>
+    
+        <!-- Message to show when no holidays are available -->
+        <p id="noHolidaysMessage" style="display:none; color: red; text-align: center;">No holidays available.</p>
+    
+        <table id="holidayTable" style="display:none; margin-top: 20px;">
+            <thead>
+                <tr>
+                    <th>Select</th>
+                    <th>Holiday Date</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody id="holidayBody"></tbody>
+        </table>
+    
+        <div class="buttons">
+            <input type="button" value="Delete Selected" onclick="confirmDelete()">
+            <input type="button" value="Back" onclick="window.location.href='/entity_admin_dashboard';">
+        </div>
+    </div>
+    <div class="image-container">
+        <img src="static/images/bg_12.png" alt="Person filling form" class="form-filling-image2">
+    </div>
+
+    <!-- Hidden divs to store success and error messages -->
+    <div id="success-message" style="display:none;">
+        {% if success_message %}
+            {{ success_message }}
+        {% endif %}
+    </div>
+
+    <div id="error-message" style="display:none;">
+        {% if error_message %}
+            {{ error_message }}
+        {% endif %}
+    </div>
+
+    <!-- Popup overlay and content -->
+    <div class="overlay" id="overlay" style="display: none;"></div>
+    <div class="popup" id="popup" style="display: none;">
+        <div id="popup-icon"></div>
+        <h2 id="popup-title"></h2>
+        <p id="popup-message"></p>
+        <button onclick="closePopup()" id="popup-button">Continue</button>
+    </div>
+
+    <!-- Load the popup.js script -->
+    <script src="{{ url_for('static', filename='js/popup.js') }}"></script>
+    
+    
+    <script>
+
+        checkMessages()
+        // Fetch holidays on page load
+        window.onload = function() {
+            fetchHolidays();  // Call fetchHolidays on load
+        };
+
+        // Fetch holidays from the server
+        function fetchHolidays() {
+            fetch('/fetch_holidays')
+                .then(response => response.json())
+                .then(data => {
+                    const holidayTable = document.getElementById('holidayTable');
+                    const holidayBody = document.getElementById('holidayBody');
+                    holidayBody.innerHTML = ''; // Clear previous holidays
+                    const noHolidaysMessage = document.getElementById('noHolidaysMessage');
+
+                    if (data.length > 0) {
+                        holidayTable.style.display = 'table';
+                        noHolidaysMessage.style.display = 'none';
+                        data.forEach(holiday => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td><input type="checkbox" name="holiday_dates" value="${holiday.Holiday_Date}"></td>
+                                <td>${holiday.Holiday_Date}</td>
+                                <td>${holiday.Description}</td>
+                            `;
+                            holidayBody.appendChild(row);
+                        });
+                    } else {
+                        holidayTable.style.display = 'none';
+                        noHolidaysMessage.style.display = 'block';
+                    }
+                });
+        }
+
+        // Confirm and delete selected holidays
+        function confirmDelete() {
+            const checkboxes = document.querySelectorAll('input[name="holiday_dates"]:checked');
+            if (checkboxes.length === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Please select at least one holiday to delete!'
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to delete the selected holidays?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const formData = new FormData();
+                    checkboxes.forEach(checkbox => {
+                        formData.append('holiday_dates', checkbox.value);
+                    });
+
+                    fetch('/delete_holidays', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.message) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted!',
+                                text: data.message
+                            }).then(() => {
+                                // After deletion, refresh the holiday list
+                                fetchHolidays();
+                            });
+                        } else if (data.error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: data.error
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+</html>
